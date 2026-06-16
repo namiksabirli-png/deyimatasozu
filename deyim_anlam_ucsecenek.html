@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Deyim Bilmece · Klasik Defter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            background: #0e1f12;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+
+        .defter {
+            width: 100%;
+            max-width: 820px;
+            height: 94vh;
+            max-height: 780px;
+            background: linear-gradient(160deg, #faf3dd 0%, #efe3c0 60%, #e2d2a8 100%);
+            border-radius: 2px 16px 16px 2px;
+            box-shadow:
+                -6px 0 0 #b18b2a,
+                0 0 0 3px #d6b44a,
+                6px 12px 48px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .defter::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: repeating-linear-gradient(transparent, transparent 34px, rgba(130, 100, 30, 0.09) 34px, rgba(130, 100, 30, 0.09) 35px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .defter::after {
+            content: '';
+            position: absolute;
+            left: 44px;
+            top: 0; bottom: 0;
+            width: 1.6px;
+            background: rgba(190, 70, 50, 0.25);
+            z-index: 1;
+        }
+
+        .baslik {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px 6px 20px;
+            border-bottom: 1.5px solid rgba(150, 120, 30, 0.25);
+            background: rgba(255, 248, 215, 0.5);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .sol {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .etiket {
+            background: rgba(80, 60, 10, 0.08);
+            border: 1px solid rgba(160, 130, 30, 0.35);
+            border-radius: 30px;
+            padding: 2px 14px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #3e2e08;
+            letter-spacing: 0.3px;
+        }
+
+        .puan-etiketi {
+            background: #1d492a;
+            color: #caf0b0;
+            border-color: #2f6a3e;
+        }
+
+        .sag {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ses-btn {
+            background: #25683e;
+            border: none;
+            color: #e4fad0;
+            font-size: 0.78rem;
+            padding: 5px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: inherit;
+            transition: 0.12s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .ses-btn:hover { background: #32804e; }
+        .ses-btn:active { transform: scale(0.95); }
+
+        .sifirla-btn {
+            background: transparent;
+            border: 1px solid rgba(160, 120, 20, 0.4);
+            color: #5a4008;
+            border-radius: 30px;
+            padding: 4px 14px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .sifirla-btn:hover { background: rgba(160, 120, 20, 0.12); }
+
+        .govde {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 8px 14px 8px 52px;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .deyim-alani {
+            flex: 0 0 48%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 10px 6px 8px 0;
+            border-bottom: 1.5px solid rgba(150, 120, 30, 0.2);
+            min-height: 0;
+        }
+
+        .deyim-baslik {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #7a5a14;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            opacity: 0.75;
+        }
+
+        .anlam-metin {
+            font-family: 'Segoe UI', 'Georgia', serif;
+            font-size: clamp(1.2rem, 2.8vh, 2rem);
+            font-weight: 600;
+            color: #191e0e;
+            line-height: 1.5;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .ornek-metin {
+            font-size: clamp(0.85rem, 1.6vh, 1.15rem);
+            font-weight: 400;
+            color: #3d3a28;
+            margin-top: 6px;
+            font-style: italic;
+            opacity: 0.8;
+            border-left: 3px solid rgba(160, 130, 40, 0.3);
+            padding-left: 12px;
+        }
+
+        .soru-alani {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 12px 0 6px;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .soru-etiket {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #5a4008;
+            margin-bottom: 8px;
+            opacity: 0.85;
+        }
+
+        .secenekler {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .sec-btn {
+            background: rgba(30, 60, 22, 0.88);
+            border: 1.6px solid rgba(80, 160, 60, 0.45);
+            border-radius: 50px;
+            padding: 0 18px;
+            min-height: 42px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #d2f0b8;
+            cursor: pointer;
+            text-align: center;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            transition: 0.1s;
+            flex-shrink: 0;
+        }
+        .sec-btn:hover:not([disabled]) {
+            background: rgba(40, 90, 26, 0.95);
+            border-color: rgba(120, 220, 80, 0.7);
+            color: #ecffe0;
+        }
+        .sec-btn.dogru {
+            background: #1a4f2a !important;
+            border-color: #50b86a !important;
+            color: #d8ffd0 !important;
+        }
+        .sec-btn.yanlis {
+            background: #6b1f14 !important;
+            border-color: #d06050 !important;
+            color: #ffd8d0 !important;
+            text-decoration: line-through;
+        }
+        .sec-btn[disabled] { cursor: default; }
+
+        .alt-cubuk {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 16px 8px 52px;
+            border-top: 1.5px solid rgba(150, 120, 30, 0.2);
+            background: rgba(255, 248, 215, 0.35);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .geri-bildirim {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #4a3a0e;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sonraki-btn {
+            background: linear-gradient(135deg, #9a6912, #c48c0e);
+            border: none;
+            padding: 7px 22px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #fffce0;
+            cursor: pointer;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+            box-shadow: 0 3px 0 #684a0a, 0 4px 14px rgba(0,0,0,0.2);
+            transition: 0.1s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .sonraki-btn:hover { background: linear-gradient(135deg, #b07814, #d8a010); }
+        .sonraki-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #684a0a; }
+        .sonraki-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        @media (max-height: 640px) {
+            .anlam-metin { font-size: clamp(1rem, 2.2vh, 1.4rem); }
+            .ornek-metin { font-size: clamp(0.7rem, 1.2vh, 0.9rem); }
+            .sec-btn { min-height: 34px; font-size: 0.78rem; padding: 0 12px; }
+            .deyim-alani { flex: 0 0 42%; }
+        }
+
+        @media (max-height: 500px) {
+            .anlam-metin { font-size: 0.9rem; }
+            .sec-btn { min-height: 30px; font-size: 0.7rem; }
+            .govde { padding-left: 44px; }
+            .defter::after { left: 36px; }
+        }
+
+        @media (min-width: 700px) {
+            .govde { padding-left: 64px; }
+            .defter::after { left: 52px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="defter">
+
+    <div class="baslik">
+        <div class="sol">
+            <span class="etiket">📖 <span id="soruNo">1</span>/<span id="toplamSoru">10</span></span>
+            <span class="etiket puan-etiketi">⭐ <span id="puan">0</span> puan</span>
+        </div>
+        <div class="sag">
+            <button class="ses-btn" id="sesBtn">🔊 Oku</button>
+            <button class="sifirla-btn" id="sifirlaBtn">🔄 Yeni Set</button>
+        </div>
+    </div>
+
+    <div class="govde">
+
+        <!-- ANLAM + ÖRNEK CÜMLE (deyim ... ile gizli) -->
+        <div class="deyim-alani">
+            <div class="deyim-baslik">📝 Açıklama · Örnek</div>
+            <div class="anlam-metin" id="anlamMetin"></div>
+            <div class="ornek-metin" id="ornekMetin"></div>
+        </div>
+
+        <!-- SORU + SEÇENEKLER (deyimler) -->
+        <div class="soru-alani">
+            <div class="soru-etiket">🌙 Bu açıklamaya uygun deyim hangisidir?</div>
+            <div class="secenekler" id="secenekKutu"></div>
+        </div>
+
+    </div>
+
+    <div class="alt-cubuk">
+        <div class="geri-bildirim" id="geriBildirim">💡 Bir seçenek seçin</div>
+        <button class="sonraki-btn" id="sonrakiBtn">⏩ Sonraki</button>
+    </div>
+
+</div>
+
+<script>
+    // ─── DEYİM VERİTABANI ────────────────────────────────────────────
+    // Örnek cümlelerde deyim "..." ile gizlenmiştir.
+    const DEYIMLER = [
+        { deyim: "Aba altından değnek göstermek", anlam: "Sakin, yumuşak görünmekle birlikte karşısındakini gizliden gizliye korkutmak", ornek: "Yumuşak tavırlarına aldanma, ... gösteriyor." },
+        { deyim: "Abesle iştigal etmek", anlam: "Yersiz, yararsız, boş ve anlamsız şeylerle vakit geçirmek", ornek: "Şu yaşa geldin, ama ... vazgeçmedin." },
+        { deyim: "Acısını çıkarmak", anlam: "Önceden uğradığı zararı sonradan gidermek; öç almak", ornek: "Bir gün bana yaptıklarının ... senden çıkaracağım." },
+        { deyim: "Acı söz", anlam: "İnsanın gönlünü inciten, onuruna dokunan ağır söz", ornek: "Bu ... kim katlanır sanıyorsun?" },
+        { deyim: "Açığa vurmak", anlam: "Gizli bir şeyi herkese duyurmak, ortaya çıkarmak", ornek: "Yıllardır içinde sakladığı sırrı mahkemede ..." },
+        { deyim: "Açık kapı bırakmak", anlam: "İleriyi düşünerek kesip atmamak, yeniden dönme imkânı bırakmak", ornek: "Bu kadar kesin konuşmayalım, ..." },
+        { deyim: "Açık konuşmak", anlam: "Gerçeği sakınmadan, çekinmeden söylemek", ornek: "Daima ... insanları severim." },
+        { deyim: "Adamdan saymak", anlam: "Değeri olmadığı hâlde bir kimseye kıymet vermek", ornek: "Seni ... diye mi naz yapıyorsun?" },
+        { deyim: "Adam evladı", anlam: "İyi yetiştirilmiş; özü sözü doğru çocuk", ornek: "Bu iyiliği ancak bir ... yapabilirdi." },
+        { deyim: "İnsan sarrafı", anlam: "İnsanların iyisini kötüsünü çabuk anlayan kimse", ornek: "Baban ...dır, onun ne mal olduğunu kolayca anlar." },
+        { deyim: "Adı çıkmak", anlam: "Kötü bir şöhret kazanmak", ornek: "Bir kere ..., ne yapsa fayda etmiyor." },
+        { deyim: "Ağır başlı", anlam: "Ciddî, olgun, hareketlerinde ölçülü kimse", ornek: "... olmak insana üstün meziyetler kazandırır." },
+        { deyim: "Ağırdan almak", anlam: "Bir işi yapmakta acele etmemek, yavaş davranmak", ornek: "Hiç sebep yokken işi ... anlamıyorum." },
+        { deyim: "Ağız aramak", anlam: "Öğrenilmek istenen şeyi söyletecek yolda dil kullanmak", ornek: "... bakalım o konuda bir şey biliyor mu?" },
+        { deyim: "Ağız birliği etmek", anlam: "Önceden anlaşarak aynı şeyi söylemek ya da yapmak", ornek: "... hep birlikte savunmalıyız." },
+        { deyim: "Ağız değiştirmek", anlam: "Daha önce söylediğinin tersini söylemeye başlamak", ornek: "Babasını görünce korkusundan ..." },
+        { deyim: "Ağız kalabalığı", anlam: "Birbirini tutmayan, gereksiz, konu dışı sözler", ornek: "Asıl meseleyi ... ile ört bas edemezsin!" },
+        { deyim: "Ağzı kulaklarına varmak", anlam: "Çok sevinmek, sevinci her hâlinden belli olmak", ornek: "Takdirname eline verilince ..." },
+        { deyim: "Ağzına bir parmak bal çalmak", anlam: "Tatlı sözlerle oyalamak, kandırmak", ornek: "... sonra her istediğini yaptır." },
+        { deyim: "Ağzından bal akmak", anlam: "Çok tatlı, hoşa gider biçimde konuşmak", ornek: "Konuş, konuş hele; ..." },
+        { deyim: "Ağzından çıkanı kulağı işitmemek", anlam: "Öfkeyle, sonunu hesaplamadan konuşmak", ornek: "... kulağın duymuyor." },
+        { deyim: "Ağzını bıçak açmamak", anlam: "Kırgınlıktan, üzüntüden söz söyleyecek durumda olmamak", ornek: "Evin yanışına öyle üzülmüş ki ..." },
+        { deyim: "Ağzının payını vermek", anlam: "Sert söz ve davranışlarla karşılık vermek", ornek: "Ben de senin ... vermezsem bana da Hasan demesinler!" },
+        { deyim: "Akan sular durmak", anlam: "Artık itiraz edilecek nokta kalmamak", ornek: "O devreye girdi mi ..." },
+        { deyim: "Akıl kârı olmamak", anlam: "Akıllı, dengeli bir kişinin yapacağı iş olmamak", ornek: "... mı şimdi senin yaptığın bu iş?" },
+        { deyim: "Akıl öğretmek", anlam: "Yol gösterip tavsiyede bulunmak", ornek: "Sana ... bir adam da mı bulamadın?" },
+        { deyim: "Akla karayı seçmek", anlam: "Bir iş uğrunda çok zahmet çekmek", ornek: "Seni buluncaya kadar ..." },
+        { deyim: "Aklı karışmak", anlam: "Ne yapacağını bilememek, bocalamak", ornek: "Dur hele, söylediklerin ..." },
+        { deyim: "Aklına esmek", anlam: "Birden yapmaya karar vermek", ornek: "Birden ..., kalkıp sahile indi." },
+        { deyim: "Aklına koymak", anlam: "Bir şeyi yapmaya kesin karar vermek", ornek: "Bu sene takıntısız sınıfımı geçmeyi ..." }
+    ];
+
+    // ─── OYUN DURUMU ──────────────────────────────────────────────────
+    let setSoru = [];
+    let indeks = 0;
+    let puan = 0;
+    let cevapVerildi = false;
+    let zamanlayici = null;
+    const SET_ADET = 10;
+
+    function karistir(dizi) {
+        const k = [...dizi];
+        for (let i = k.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [k[i], k[j]] = [k[j], k[i]];
+        }
+        return k;
+    }
+
+    function setOlustur() {
+        const hepsi = [...DEYIMLER];
+        const secilen = karistir(hepsi).slice(0, SET_ADET);
+        return secilen.map(s => {
+            // 2 yanlış deyim bul (kendi deyimi dışında)
+            const digerDeyimler = DEYIMLER.filter(d => d.deyim !== s.deyim).map(d => d.deyim);
+            const yanlis = karistir(digerDeyimler).slice(0, 2);
+            const secenekler = karistir([s.deyim, ...yanlis]);
+            return {
+                deyim: s.deyim,
+                anlam: s.anlam,
+                ornek: s.ornek,
+                secenekler: secenekler
+            };
+        });
+    }
+
+    function render() {
+        clearTimeout(zamanlayici);
+        if (indeks >= setSoru.length) {
+            document.getElementById('geriBildirim').textContent = '🎉 Set tamamlandı! Yeni Set ile devam edin.';
+            document.getElementById('sonrakiBtn').disabled = true;
+            document.getElementById('sesBtn').disabled = true;
+            return;
+        }
+
+        const soru = setSoru[indeks];
+        document.getElementById('soruNo').textContent = indeks + 1;
+        document.getElementById('toplamSoru').textContent = SET_ADET;
+        document.getElementById('anlamMetin').textContent = soru.anlam;
+        document.getElementById('ornekMetin').textContent = '“' + soru.ornek + '”';
+
+        const kutu = document.getElementById('secenekKutu');
+        kutu.innerHTML = '';
+        soru.secenekler.forEach(sec => {
+            const btn = document.createElement('button');
+            btn.className = 'sec-btn';
+            btn.textContent = sec;
+            btn.addEventListener('click', () => cevapKontrol(sec));
+            kutu.appendChild(btn);
+        });
+
+        document.getElementById('geriBildirim').textContent = '💡 Bir seçenek seçin';
+        cevapVerildi = false;
+        document.getElementById('sonrakiBtn').disabled = false;
+        document.getElementById('sesBtn').disabled = false;
+    }
+
+    function cevapKontrol(secim) {
+        if (cevapVerildi) return;
+        cevapVerildi = true;
+        const soru = setSoru[indeks];
+        const dogru = secim === soru.deyim;
+
+        if (dogru) {
+            puan++;
+            document.getElementById('puan').textContent = puan;
+            document.getElementById('geriBildirim').textContent = '✅ Doğru! +1 puan';
+        } else {
+            document.getElementById('geriBildirim').textContent = '❌ Yanlış! Doğru: ' + soru.deyim;
+        }
+
+        const butonlar = document.querySelectorAll('.sec-btn');
+        butonlar.forEach(b => {
+            b.disabled = true;
+            if (b.textContent === soru.deyim) b.classList.add('dogru');
+            else if (b.textContent === secim && !dogru) b.classList.add('yanlis');
+        });
+
+        zamanlayici = setTimeout(ileri, 1500);
+    }
+
+    function ileri() {
+        if (!cevapVerildi) {
+            document.getElementById('geriBildirim').textContent = '⚠️ Önce cevap seçin!';
+            return;
+        }
+        indeks++;
+        render();
+    }
+
+    let ses = null;
+    function sesOku(anlam, ornek) {
+        if (!window.speechSynthesis) return;
+        const metin = `Açıklama: ${anlam}. Örnek: ${ornek}`;
+        if (ses) {
+            speechSynthesis.cancel();
+        }
+        const u = new SpeechSynthesisUtterance(metin);
+        u.lang = 'tr-TR';
+        u.rate = 0.8;
+        u.pitch = 1;
+        speechSynthesis.speak(u);
+    }
+
+    function sifirla() {
+        clearTimeout(zamanlayici);
+        speechSynthesis.cancel();
+        setSoru = setOlustur();
+        indeks = 0;
+        puan = 0;
+        cevapVerildi = false;
+        document.getElementById('puan').textContent = '0';
+        render();
+    }
+
+    document.getElementById('sonrakiBtn').addEventListener('click', ileri);
+    document.getElementById('sifirlaBtn').addEventListener('click', sifirla);
+    document.getElementById('sesBtn').addEventListener('click', () => {
+        if (indeks < setSoru.length) {
+            const s = setSoru[indeks];
+            sesOku(s.anlam, s.ornek);
+        }
+    });
+
+    setSoru = setOlustur();
+    render();
+</script>
+
+</body>
+</html>
