@@ -235,9 +235,9 @@
             color: #ecffe0;
         }
         .sec-btn.dogru {
-            background: #1a4f2a !important;
-            border-color: #50b86a !important;
-            color: #d8ffd0 !important;
+            background: #15457a !important;
+            border-color: #4fa0e8 !important;
+            color: #d8ecff !important;
         }
         .sec-btn.yanlis {
             background: #6b1f14 !important;
@@ -306,6 +306,13 @@
         @media (min-width: 700px) {
             .govde { padding-left: 64px; }
             .defter::after { left: 52px; }
+        }
+
+        /* konfeti animasyonu */
+        @keyframes confFall {
+            0% { opacity: 0; transform: translate(0, 0) rotate(0); }
+            10% { opacity: 1; }
+            100% { opacity: 0; transform: translate(var(--drift), 105vh) rotate(720deg); }
         }
     </style>
 </head>
@@ -392,6 +399,62 @@
     let zamanlayici = null;
     const SET_ADET = 10;
 
+    // ─── ALKIŞ EFEKTİ (ses + konfeti) ─────────────────────────────────
+    let alkisCtx = null;
+    function alkisCal() {
+        try {
+            alkisCtx = alkisCtx || new (window.AudioContext || window.webkitAudioContext)();
+            const ctx = alkisCtx;
+            if (ctx.state === 'suspended') ctx.resume();
+            const dur = 1.1;
+            const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+            const data = buf.getChannelData(0);
+            for (let i = 0; i < data.length; i++) {
+                const t = i / data.length;
+                const env = Math.sin(Math.PI * t) * (1 - t * 0.3);
+                const clap = (Math.random() * 2 - 1) * (Math.random() < 0.06 ? 1 : 0.25);
+                data[i] = clap * env * 0.5;
+            }
+            const src = ctx.createBufferSource();
+            src.buffer = buf;
+            const filt = ctx.createBiquadFilter();
+            filt.type = 'bandpass'; filt.frequency.value = 1800; filt.Q.value = 0.7;
+            const gain = ctx.createGain(); gain.gain.value = 0.9;
+            src.connect(filt); filt.connect(gain); gain.connect(ctx.destination);
+            src.start();
+        } catch (e) { /* ses desteklenmiyorsa sessizce geç */ }
+    }
+
+    function konfetiFirlat() {
+        const renkler = ['#4fa0e8', '#15457a', '#ffd36b', '#5ec87a', '#e8709b', '#ffffff'];
+        const N = 80;
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;';
+        document.body.appendChild(wrap);
+        for (let i = 0; i < N; i++) {
+            const p = document.createElement('div');
+            const sz = 6 + Math.random() * 8;
+            const left = Math.random() * 100;
+            const dur = 1.6 + Math.random() * 1.4;
+            const delay = Math.random() * 0.25;
+            const rot = Math.random() * 360;
+            const drift = (Math.random() * 2 - 1) * 120;
+            p.style.cssText = `position:absolute;top:-20px;left:${left}%;width:${sz}px;height:${sz * 0.5}px;`
+                + `background:${renkler[i % renkler.length]};opacity:0;`
+                + `border-radius:${Math.random() < 0.5 ? '50%' : '2px'};`
+                + `transform:rotate(${rot}deg);`
+                + `animation:confFall ${dur}s ${delay}s ease-in forwards;`
+                + `--drift:${drift}px;`;
+            wrap.appendChild(p);
+        }
+        setTimeout(() => wrap.remove(), 3600);
+    }
+
+    function kutla() {
+        alkisCal();
+        konfetiFirlat();
+    }
+
     function karistir(dizi) {
         const k = [...dizi];
         for (let i = k.length - 1; i > 0; i--) {
@@ -459,6 +522,7 @@
             puan++;
             document.getElementById('puan').textContent = puan;
             document.getElementById('geriBildirim').textContent = '✅ Doğru! +1 puan';
+            kutla();
         } else {
             document.getElementById('geriBildirim').textContent = '❌ Yanlış! Doğru: ' + soru.deyim;
         }
