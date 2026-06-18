@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Karagöz ve Hacivat - Anlama Etkinliği</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 18px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            line-height: 1.3;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .text-section {
+            padding: 25px 20px;
+            background: #f8f9fa;
+            border-bottom: 3px solid #dee2e6;
+        }
+
+        .text-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .dialogue-text {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            line-height: 2.2;
+            color: #34495e;
+            font-size: 1.1rem;
+            border-left: 5px solid #9b59b6;
+        }
+
+        .speaker {
+            font-weight: bold;
+            color: #e74c3c;
+            font-size: 1.15rem;
+        }
+
+        .table-container {
+            padding: 25px 20px;
+        }
+
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 5px solid #2196f3;
+            color: #1565c0;
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th {
+            background: #9b59b6;
+            color: white;
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        td {
+            padding: 20px 15px;
+            border-bottom: 1px solid #ecf0f1;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .number {
+            font-weight: bold;
+            color: #e74c3c;
+            width: 60px;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+
+        .question {
+            color: #2c3e50;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .answer-cell {
+            width: 160px;
+            text-align: center;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .answer-btn {
+            width: 70px;
+            height: 70px;
+            border: none;
+            border-radius: 12px;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            min-width: 60px;
+            min-height: 60px;
+        }
+
+        .btn-correct {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-correct:hover {
+            background: #2ecc71;
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+        }
+
+        .btn-wrong {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-wrong:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .answer-btn.correct {
+            background: #27ae60;
+            color: white;
+            animation: correctPulse 0.6s ease;
+            cursor: default;
+        }
+
+        .answer-btn.wrong {
+            background: #e74c3c;
+            color: white;
+            animation: wrongShake 0.6s ease;
+            cursor: default;
+        }
+
+        .answer-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .score {
+            text-align: center;
+            padding: 25px 20px;
+            background: #f8f9fa;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+            border-top: 3px solid #ecf0f1;
+            line-height: 1.6;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            position: absolute;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .effect-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 100px;
+            z-index: 1000;
+            pointer-events: none;
+            animation: effectPop 1s ease forwards;
+        }
+
+        @keyframes effectPop {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+
+        /* Mobil için özel ayarlar */
+        @media (max-width: 768px) {
+            html {
+                font-size: 16px;
+            }
+
+            body {
+                padding: 5px;
+            }
+
+            .container {
+                border-radius: 10px;
+            }
+
+            .header {
+                padding: 25px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .text-section {
+                padding: 20px 15px;
+            }
+
+            .text-section h2 {
+                font-size: 1.3rem;
+            }
+
+            .dialogue-text {
+                padding: 15px;
+                font-size: 1rem;
+                line-height: 2;
+            }
+
+            .speaker {
+                font-size: 1.05rem;
+            }
+
+            .table-container {
+                padding: 20px 10px;
+            }
+
+            .instructions {
+                padding: 15px;
+                font-size: 0.95rem;
+            }
+
+            th {
+                padding: 15px 10px;
+                font-size: 1rem;
+            }
+
+            td {
+                padding: 18px 10px;
+            }
+
+            .number {
+                font-size: 1.2rem;
+                width: 50px;
+            }
+
+            .question {
+                font-size: 0.95rem;
+                line-height: 1.7;
+            }
+
+            .answer-btn {
+                width: 65px;
+                height: 65px;
+                font-size: 1.8rem;
+            }
+
+            .score {
+                font-size: 1.2rem;
+                padding: 20px 15px;
+            }
+        }
+
+        /* Küçük mobil ekranlar için */
+        @media (max-width: 480px) {
+            html {
+                font-size: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .dialogue-text {
+                font-size: 0.95rem;
+            }
+
+            .question {
+                font-size: 0.9rem;
+            }
+
+            .answer-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 1.6rem;
+            }
+
+            .btn-group {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎭 Karagöz ve Hacivat</h1>
+            <p>Anlama ve Değerlendirme Etkinliği</p>
+        </div>
+        
+        <div class="text-section">
+            <h2>📖 Metin</h2>
+            <div class="dialogue-text">
+                <p><span class="speaker">Hacivat:</span> Merhaba Karagöz'üm, uğurlar olsun!</p>
+                <p><span class="speaker">Karagöz:</span> İftar kokuları burnuna dolsun!</p>
+                <p><span class="speaker">Hacivat:</span> Hah hah hah!.. Eksik olma, beni yine güldürdün! Aman!..</p>
+                <p><span class="speaker">Karagöz:</span> Ne oldu Hacı Cavcav, kel kafanı bit mi ısırdı?</p>
+                <p><span class="speaker">Hacivat:</span> Değil efendim! Sen göbeklenmişsin?..</p>
+                <p><span class="speaker">Karagöz:</span> Pataklarım ha, ağzını bozma!</p>
+                <p><span class="speaker">Hacivat:</span> Canım fena bir şeyi mi söyledim?</p>
+                <p><span class="speaker">Karagöz:</span> Köftehor, "Sen köpek yemişsin!" dedin ya!..</p>
+                <p><span class="speaker">Hacivat:</span> Efendim hiç öyle söyler miyim? Yani göbek yapmışsın, diyorum.</p>
+                <p><span class="speaker">Karagöz:</span> Ne zaman börek yapmışsın?..</p>
+                <p><span class="speaker">Hacivat:</span> Allah iyiliğini versin, hemen saçmalamaya başladın! Kilo almışsın...</p>
+                <p><span class="speaker">Karagöz:</span> Bizde terazi yok kilo alıp ne yapayım?</p>
+                <p><span class="speaker">Hacivat:</span> Nasıl anlatmalı?.. Şişmanlamışsın!..</p>
+                <p><span class="speaker">Karagöz:</span> Öyle söylesene! Hay hay!..</p>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="instructions">
+                <strong>📝 Yönerge:</strong> Metne göre aşağıdaki tablodaki ifadelerin doğru olduğunu düşünüyorsanız <strong>✓</strong>, yanlış olduğunu düşünüyorsanız <strong>✗</strong> işaretine tıklayın. Her tıklamada anında geri bildirim alacaksınız!
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">No</th>
+                        <th>İfade</th>
+                        <th style="width: 160px; text-align: center;">✓ / ✗</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-correct="true" data-id="1">
+                        <td class="number">1.</td>
+                        <td class="question">Yanlış anlamalara dayalı güldürü ögelerine yer verilmiştir.</td>
+                        <td class="answer-cell">
+                            <div class="btn-group">
+                                <button class="answer-btn btn-correct" onclick="checkAnswer(1, '✓')">✓</button>
+                                <button class="answer-btn btn-wrong" onclick="checkAnswer(1, '✗')"></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-correct="false" data-id="2">
+                        <td class="number">2.</td>
+                        <td class="question">Karagöz oyununun "fasıl" bölümünden alınmıştır.</td>
+                        <td class="answer-cell">
+                            <div class="btn-group">
+                                <button class="answer-btn btn-correct" onclick="checkAnswer(2, '✓')">✓</button>
+                                <button class="answer-btn btn-wrong" onclick="checkAnswer(2, '✗')">✗</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-correct="false" data-id="3">
+                        <td class="number">3.</td>
+                        <td class="question">Hacivat, eğitim görmemiş, açık sözlü, hazırcevap bir tiptir.</td>
+                        <td class="answer-cell">
+                            <div class="btn-group">
+                                <button class="answer-btn btn-correct" onclick="checkAnswer(3, '✓')">✓</button>
+                                <button class="answer-btn btn-wrong" onclick="checkAnswer(3, '✗')">✗</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-correct="true" data-id="4">
+                        <td class="number">4.</td>
+                        <td class="question">Mekân ve zaman unsurları arka plandadır.</td>
+                        <td class="answer-cell">
+                            <div class="btn-group">
+                                <button class="answer-btn btn-correct" onclick="checkAnswer(4, '✓')">✓</button>
+                                <button class="answer-btn btn-wrong" onclick="checkAnswer(4, '✗')">✗</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-correct="true" data-id="5">
+                        <td class="number">5.</td>
+                        <td class="question">Karagöz, Hacivat'ın sözlerini çoğu zaman yanlış anlayarak karşılık vermiştir.</td>
+                        <td class="answer-cell">
+                            <div class="btn-group">
+                                <button class="answer-btn btn-correct" onclick="checkAnswer(5, '✓')">✓</button>
+                                <button class="answer-btn btn-wrong" onclick="checkAnswer(5, '✗')">✗</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-correct="true" data-id="6">
+                        <td class="number">6.</td>
+                        <td class="question">Metinde Hacivat'ın Karagöz'ün kilo aldığını söylemesi üzerine konuşma gelişmiştir.</td>
+                        <td class="answer-cell">
+                            <div class="btn-group">
+                                <button class="answer-btn btn-correct" onclick="checkAnswer(6, '✓')">✓</button>
+                                <button class="answer-btn btn-wrong" onclick="checkAnswer(6, '✗')">✗</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-correct="true" data-id="7">
+                        <td class="number">7.</td>
+                        <td class="question">Karagöz, Hacivat'a karşı zaman zaman kızgın ve tehditkâr ifadeler kullanmıştır.</td>
+                        <td class="answer-cell">
+                            <div class="btn-group">
+                                <button class="answer-btn btn-correct" onclick="checkAnswer(7, '✓')">✓</button>
+                                <button class="answer-btn btn-wrong" onclick="checkAnswer(7, '✗')">✗</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-correct="false" data-id="8">
+                        <td class="number">8.</td>
+                        <td class="question">Metinde olaylar ayrıntılı bir mekân tasviriyle anlatılmıştır.</td>
+                        <td class="answer-cell">
+                            <div class="btn-group">
+                                <button class="answer-btn btn-correct" onclick="checkAnswer(8, '✓')">✓</button>
+                                <button class="answer-btn btn-wrong" onclick="checkAnswer(8, '✗')">✗</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-correct="true" data-id="9">
+                        <td class="number">9.</td>
+                        <td class="question">Karagöz'ün "kilo" kelimesini "teraziyle alınan bir şey" gibi anlaması güldürü oluşturmuştur.</td>
+                        <td class="answer-cell">
+                            <div class="btn-group">
+                                <button class="answer-btn btn-correct" onclick="checkAnswer(9, '✓')">✓</button>
+                                <button class="answer-btn btn-wrong" onclick="checkAnswer(9, '✗')">✗</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-correct="false" data-id="10">
+                        <td class="number">10.</td>
+                        <td class="question">Metinde Karagöz ile Hacivat arasında ciddi ve öğretici bir tartışma yapılmıştır.</td>
+                        <td class="answer-cell">
+                            <div class="btn-group">
+                                <button class="answer-btn btn-correct" onclick="checkAnswer(10, '✓')">✓</button>
+                                <button class="answer-btn btn-wrong" onclick="checkAnswer(10, '✗')">✗</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="score" id="score">
+                Toplam: 0 / 10
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let correctCount = 0;
+        let answeredCount = 0;
+        const totalQuestions = 10;
+
+        function checkAnswer(id, userAnswer) {
+            const row = document.querySelector(`tr[data-id="${id}"]`);
+            const isCorrect = row.dataset.correct === "true";
+            const buttons = row.querySelectorAll('.answer-btn');
+            
+            if (row.classList.contains('answered')) {
+                return;
+            }
+            
+            row.classList.add('answered');
+            answeredCount++;
+            
+            buttons.forEach(btn => {
+                btn.classList.add('disabled');
+            });
+            
+            if ((isCorrect && userAnswer === '✓') || (!isCorrect && userAnswer === '✗')) {
+                correctCount++;
+                
+                if (userAnswer === '✓') {
+                    buttons[0].classList.add('correct');
+                } else {
+                    buttons[1].classList.add('correct');
+                }
+                
+                showEffect('🎉', 'correct');
+                createConfetti();
+                playSound('correct');
+            } else {
+                if (userAnswer === '✓') {
+                    buttons[0].classList.add('wrong');
+                } else {
+                    buttons[1].classList.add('wrong');
+                }
+                
+                if (isCorrect) {
+                    buttons[0].classList.add('correct');
+                } else {
+                    buttons[1].classList.add('correct');
+                }
+                
+                showEffect('', 'wrong');
+                playSound('wrong');
+            }
+
+            updateScore();
+        }
+
+        function showEffect(emoji, type) {
+            const effect = document.createElement('div');
+            effect.className = 'effect-overlay';
+            effect.textContent = emoji;
+            effect.style.fontSize = type === 'correct' ? '120px' : '100px';
+            document.body.appendChild(effect);
+            
+            setTimeout(() => {
+                effect.remove();
+            }, 1000);
+        }
+
+        function createConfetti() {
+            const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
+            
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+
+        function playSound(type) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            if (type === 'correct') {
+                oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1);
+                oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } else {
+                oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.3);
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            }
+        }
+
+        function updateScore() {
+            const scoreDiv = document.getElementById('score');
+            scoreDiv.innerHTML = `Toplam: ${correctCount} / ${answeredCount} (Doğru) - ${totalQuestions - answeredCount} kaldı`;
+            
+            if (answeredCount === totalQuestions) {
+                setTimeout(() => {
+                    if (correctCount === totalQuestions) {
+                        scoreDiv.innerHTML += '<br><br>🏆 Mükemmel! Tüm soruları doğru bildiniz!';
+                        createConfetti();
+                    } else if (correctCount >= 7) {
+                        scoreDiv.innerHTML += '<br><br>👏 Çok iyi! Başarılısınız!';
+                    } else {
+                        scoreDiv.innerHTML += '<br><br>💪 Daha fazla çalışmalısınız!';
+                    }
+                }, 500);
+            }
+        }
+    </script>
+</body>
+</html>
