@@ -29,10 +29,7 @@
             max-height: 780px;
             background: linear-gradient(160deg, #faf3dd 0%, #efe3c0 60%, #e2d2a8 100%);
             border-radius: 2px 16px 16px 2px;
-            box-shadow:
-                -6px 0 0 #b18b2a,
-                0 0 0 3px #d6b44a,
-                6px 12px 48px rgba(0,0,0,0.6);
+            box-shadow: -6px 0 0 #b18b2a, 0 0 0 3px #d6b44a, 6px 12px 48px rgba(0,0,0,0.6);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -308,7 +305,6 @@
             .defter::after { left: 52px; }
         }
 
-        /* konfeti animasyonu */
         @keyframes confFall {
             0% { opacity: 0; transform: translate(0, 0) rotate(0); }
             10% { opacity: 1; }
@@ -333,14 +329,12 @@
 
     <div class="govde">
 
-        <!-- ANLAM + ÖRNEK CÜMLE (deyim ... ile gizli) -->
         <div class="deyim-alani">
             <div class="deyim-baslik">📝 Açıklama · Örnek</div>
             <div class="anlam-metin" id="anlamMetin"></div>
             <div class="ornek-metin" id="ornekMetin"></div>
         </div>
 
-        <!-- SORU + SEÇENEKLER (deyimler) -->
         <div class="soru-alani">
             <div class="soru-etiket">🌙 Bu açıklamaya uygun deyim hangisidir?</div>
             <div class="secenekler" id="secenekKutu"></div>
@@ -356,39 +350,228 @@
 </div>
 
 <script>
-    // ─── DEYİM VERİTABANI ────────────────────────────────────────────
-    // Örnek cümlelerde deyim "..." ile gizlenmiştir.
+    // ─── TÜM DEYİMLER (ÖNCEKİ + YENİ EKLENENLER) ────────────────────
     const DEYIMLER = [
-        { deyim: "Aba altından değnek göstermek", anlam: "Sakin, yumuşak görünmekle birlikte karşısındakini gizliden gizliye korkutmak", ornek: "Yumuşak tavırlarına aldanma, ... gösteriyor." },
-        { deyim: "Abesle iştigal etmek", anlam: "Yersiz, yararsız, boş ve anlamsız şeylerle vakit geçirmek", ornek: "Şu yaşa geldin, ama ... vazgeçmedin." },
-        { deyim: "Acısını çıkarmak", anlam: "Önceden uğradığı zararı sonradan gidermek; öç almak", ornek: "Bir gün bana yaptıklarının ... senden çıkaracağım." },
-        { deyim: "Acı söz", anlam: "İnsanın gönlünü inciten, onuruna dokunan ağır söz", ornek: "Bu ... kim katlanır sanıyorsun?" },
-        { deyim: "Açığa vurmak", anlam: "Gizli bir şeyi herkese duyurmak, ortaya çıkarmak", ornek: "Yıllardır içinde sakladığı sırrı mahkemede ..." },
-        { deyim: "Açık kapı bırakmak", anlam: "İleriyi düşünerek kesip atmamak, yeniden dönme imkânı bırakmak", ornek: "Bu kadar kesin konuşmayalım, ..." },
-        { deyim: "Açık konuşmak", anlam: "Gerçeği sakınmadan, çekinmeden söylemek", ornek: "Daima ... insanları severim." },
-        { deyim: "Adamdan saymak", anlam: "Değeri olmadığı hâlde bir kimseye kıymet vermek", ornek: "Seni ... diye mi naz yapıyorsun?" },
-        { deyim: "Adam evladı", anlam: "İyi yetiştirilmiş; özü sözü doğru çocuk", ornek: "Bu iyiliği ancak bir ... yapabilirdi." },
-        { deyim: "İnsan sarrafı", anlam: "İnsanların iyisini kötüsünü çabuk anlayan kimse", ornek: "Baban ...dır, onun ne mal olduğunu kolayca anlar." },
-        { deyim: "Adı çıkmak", anlam: "Kötü bir şöhret kazanmak", ornek: "Bir kere ..., ne yapsa fayda etmiyor." },
-        { deyim: "Ağır başlı", anlam: "Ciddî, olgun, hareketlerinde ölçülü kimse", ornek: "... olmak insana üstün meziyetler kazandırır." },
-        { deyim: "Ağırdan almak", anlam: "Bir işi yapmakta acele etmemek, yavaş davranmak", ornek: "Hiç sebep yokken işi ... anlamıyorum." },
-        { deyim: "Ağız aramak", anlam: "Öğrenilmek istenen şeyi söyletecek yolda dil kullanmak", ornek: "... bakalım o konuda bir şey biliyor mu?" },
-        { deyim: "Ağız birliği etmek", anlam: "Önceden anlaşarak aynı şeyi söylemek ya da yapmak", ornek: "... hep birlikte savunmalıyız." },
-        { deyim: "Ağız değiştirmek", anlam: "Daha önce söylediğinin tersini söylemeye başlamak", ornek: "Babasını görünce korkusundan ..." },
-        { deyim: "Ağız kalabalığı", anlam: "Birbirini tutmayan, gereksiz, konu dışı sözler", ornek: "Asıl meseleyi ... ile ört bas edemezsin!" },
-        { deyim: "Ağzı kulaklarına varmak", anlam: "Çok sevinmek, sevinci her hâlinden belli olmak", ornek: "Takdirname eline verilince ..." },
-        { deyim: "Ağzına bir parmak bal çalmak", anlam: "Tatlı sözlerle oyalamak, kandırmak", ornek: "... sonra her istediğini yaptır." },
-        { deyim: "Ağzından bal akmak", anlam: "Çok tatlı, hoşa gider biçimde konuşmak", ornek: "Konuş, konuş hele; ..." },
-        { deyim: "Ağzından çıkanı kulağı işitmemek", anlam: "Öfkeyle, sonunu hesaplamadan konuşmak", ornek: "... kulağın duymuyor." },
-        { deyim: "Ağzını bıçak açmamak", anlam: "Kırgınlıktan, üzüntüden söz söyleyecek durumda olmamak", ornek: "Evin yanışına öyle üzülmüş ki ..." },
-        { deyim: "Ağzının payını vermek", anlam: "Sert söz ve davranışlarla karşılık vermek", ornek: "Ben de senin ... vermezsem bana da Hasan demesinler!" },
-        { deyim: "Akan sular durmak", anlam: "Artık itiraz edilecek nokta kalmamak", ornek: "O devreye girdi mi ..." },
-        { deyim: "Akıl kârı olmamak", anlam: "Akıllı, dengeli bir kişinin yapacağı iş olmamak", ornek: "... mı şimdi senin yaptığın bu iş?" },
-        { deyim: "Akıl öğretmek", anlam: "Yol gösterip tavsiyede bulunmak", ornek: "Sana ... bir adam da mı bulamadın?" },
-        { deyim: "Akla karayı seçmek", anlam: "Bir iş uğrunda çok zahmet çekmek", ornek: "Seni buluncaya kadar ..." },
-        { deyim: "Aklı karışmak", anlam: "Ne yapacağını bilememek, bocalamak", ornek: "Dur hele, söylediklerin ..." },
-        { deyim: "Aklına esmek", anlam: "Birden yapmaya karar vermek", ornek: "Birden ..., kalkıp sahile indi." },
-        { deyim: "Aklına koymak", anlam: "Bir şeyi yapmaya kesin karar vermek", ornek: "Bu sene takıntısız sınıfımı geçmeyi ..." }
+        // ─── ÖNCEKİ LİSTEDEN OLANLAR ───────────────────────────────
+        { deyim: "Ağzı kulaklarına varmak", anlam: "Çok sevinmek", ornek: "Takdirname eline verilince ..." },
+        { deyim: "Ağzından bal damlamak", anlam: "Çok tatlı ve güzel konuşmak", ornek: "Konuş, konuş hele; ..." },
+        { deyim: "Ağzını aramak", anlam: "Birinden gizli bilgi almaya çalışmak", ornek: "... bakalım o konuda bir şey biliyor mu?" },
+        { deyim: "Ağzını bıçak açmamak", anlam: "Hiç konuşmamak, suskun olmak", ornek: "Evin yanışına öyle üzülmüş ki ..." },
+        { deyim: "Ağzının payını vermek", anlam: "Birine hak ettiği karşılığı vermek", ornek: "Ben de senin ... vermezsem bana da Hasan demesinler!" },
+        { deyim: "Ağzı var dili yok", anlam: "Çok sessiz, sakin kimse", ornek: "O ... bir çocuktur." },
+        { deyim: "Ağzı açık kalmak", anlam: "Çok şaşırmak", ornek: "Manzarayı görünce ..." },
+        { deyim: "Ağzına sağlık", anlam: "Güzel söz söyleyene teşekkür etmek", ornek: "... ne güzel anlattın." },
+        { deyim: "Ağzı laf yapmak", anlam: "Güzel ve etkili konuşmak", ornek: "Onun ..." },
+        { deyim: "Ağzından kaçırmak", anlam: "Söylenmemesi gereken şeyi söylemek", ornek: "Sırrı ..." },
+
+        { deyim: "Burnu havada olmak", anlam: "Kendini beğenmiş olmak", ornek: "Başarılı olunca ..." },
+        { deyim: "Burnundan solumak", anlam: "Çok öfkeli olmak", ornek: "Odaya ... girdi." },
+        { deyim: "Burnundan getirmek", anlam: "Bir şeyi pişman edecek hâle getirmek", ornek: "Bu işi ..." },
+        { deyim: "Burnunun dibinde olmak", anlam: "Çok yakında bulunmak", ornek: "Dükkân ..." },
+        { deyim: "Burnu sürtülmek", anlam: "Gururu kırılıp ders almak", ornek: "Kazadan sonra ..." },
+        { deyim: "Burnunu sokmak", anlam: "İlgisi olmayan işe karışmak", ornek: "Her işe ..." },
+        { deyim: "Burnundan kıl aldırmamak", anlam: "Kendini çok üstün görmek", ornek: "O ..." },
+        { deyim: "Burnunun dikine gitmek", anlam: "Bildiğinden şaşmamak", ornek: "Herkes karşı çıksa da ..." },
+        { deyim: "Burnunda tütmek", anlam: "Çok özlemek", ornek: "Memleket ..." },
+
+        { deyim: "Gözden düşmek", anlam: "Eski değerini kaybetmek", ornek: "Patronun ..." },
+        { deyim: "Gözden geçirmek", anlam: "İncelemek, kontrol etmek", ornek: "Raporu tekrar ..." },
+        { deyim: "Göze girmek", anlam: "Birinin beğenisini kazanmak", ornek: "Yeni çalışan hemen ..." },
+        { deyim: "Gözden kaçmak", anlam: "Fark edilmemek", ornek: "Küçük bir detay ..." },
+        { deyim: "Gözü dönmek", anlam: "Öfke veya hırsla kontrolünü kaybetmek", ornek: "Hırs ..." },
+        { deyim: "Gözü tutmamak", anlam: "Güvenmemek, beğenmemek", ornek: "O araba ..." },
+        { deyim: "Göz kulak olmak", anlam: "Korumak, ilgilenmek", ornek: "Çocuklara ..." },
+        { deyim: "Gözü gibi sakınmak", anlam: "Çok dikkatle korumak", ornek: "Kedisini ..." },
+        { deyim: "Göz açtırmamak", anlam: "Rahat bırakmamak", ornek: "Patron bize ..." },
+        { deyim: "Göz yummak", anlam: "Görmezden gelmek", ornek: "Hatalarına ..." },
+
+        { deyim: "Kulağına küpe olmak", anlam: "Ders almak, unutmamak", ornek: "Bu sözler sana ..." },
+        { deyim: "Kulak kabartmak", anlam: "Dikkatle dinlemek", ornek: "Konuşmaları ..." },
+        { deyim: "Kulak vermek", anlam: "Dinlemek", ornek: "Anlatacaklarına ..." },
+        { deyim: "Kulağı delik olmak", anlam: "Her şeyden haberi olmak", ornek: "O ... biridir." },
+        { deyim: "Kulağına gitmek", anlam: "Bir haberin birine ulaşması", ornek: "Bu söylentiler ..." },
+        { deyim: "Kulak asmamak", anlam: "Önemsememek", ornek: "Kimse ona ..." },
+        { deyim: "Kulak kesilmek", anlam: "Çok dikkatli dinlemek", ornek: "Her söze ..." },
+        { deyim: "Kulağını çekmek", anlam: "Uyarmak, azarlamak", ornek: "Çocuğu ..." },
+        { deyim: "Kulağı çınlamak", anlam: "Kendisinden söz edildiğini düşünmek", ornek: "Seni görünce ..." },
+        { deyim: "Kulak ardı etmek", anlam: "Dikkate almamak", ornek: "Uyarıları ..." },
+
+        { deyim: "Eli ayağına dolaşmak", anlam: "Heyecandan ne yapacağını bilememek", ornek: "Sahnede ..." },
+        { deyim: "Elinden geleni yapmak", anlam: "Tüm gücüyle çabalamak", ornek: "Bu iş için ..." },
+        { deyim: "Eli açık olmak", anlam: "Cömert olmak", ornek: "O ... bir insandır." },
+        { deyim: "Eli sıkı olmak", anlam: "Cimri olmak", ornek: "Fazla ..." },
+        { deyim: "El üstünde tutmak", anlam: "Çok değer vermek", ornek: "Büyüklerini ..." },
+        { deyim: "Elini taşın altına koymak", anlam: "Sorumluluk almak", ornek: "Zor durumda ..." },
+        { deyim: "Elini eteğini çekmek", anlam: "Bir işle ilgisini kesmek", ornek: "O işten ..." },
+        { deyim: "Eline su dökemez", anlam: "Onun kadar iyi olamaz", ornek: "Senin ..." },
+        { deyim: "Eli kolu bağlı olmak", anlam: "Çaresiz kalmak", ornek: "Hiçbir şey yapamadan ..." },
+        { deyim: "El atmak", anlam: "Bir işe girişmek", ornek: "Bu işe ..." },
+
+        { deyim: "Ayağına gitmek", anlam: "Birinin yanına bizzat gitmek", ornek: "Dedemin ..." },
+        { deyim: "Ayağını denk almak", anlam: "Dikkatli davranmak", ornek: "Bu işte ..." },
+        { deyim: "Ayağı alışmak", anlam: "Bir yere sık sık gider olmak", ornek: "O kafeye ..." },
+        { deyim: "Ayağını yorganına göre uzatmak", anlam: "Gelirine göre harcamak", ornek: "... harcama yap." },
+        { deyim: "Ayak diremek", anlam: "İnat etmek", ornek: "Dediklerinde ..." },
+        { deyim: "Ayakta kalmak", anlam: "Güçlü kalmak, yıkılmamak", ornek: "Zorluklara rağmen ..." },
+        { deyim: "Ayak uydurmak", anlam: "Uyum sağlamak", ornek: "Yeni ortama hemen ..." },
+        { deyim: "Ayağına bağ olmak", anlam: "Engel olmak", ornek: "Borçlar ..." },
+        { deyim: "Ayağını kaydırmak", anlam: "Birini bulunduğu yerden düşürmek", ornek: "Rakibinin ..." },
+        { deyim: "Ayak basmak", anlam: "Bir yere varmak, girmek", ornek: "Bu topraklara ilk ..." },
+
+        { deyim: "Başına iş açmak", anlam: "Kendini zor duruma sokmak", ornek: "Boş yere ..." },
+        { deyim: "Başının çaresine bakmak", anlam: "Kendi sorununu kendisi çözmek", ornek: "Artık ..." },
+        { deyim: "Başını derde sokmak", anlam: "Sorun yaşamasına neden olmak", ornek: "Bu iş seni ..." },
+        { deyim: "Baş tacı etmek", anlam: "Çok değer vermek", ornek: "Bilge insanları ..." },
+        { deyim: "Başına kakmak", anlam: "Yapılan iyiliği sürekli hatırlatmak", ornek: "Yaptığını ..." },
+        { deyim: "Başına buyruk olmak", anlam: "Kendi bildiğini yapmak", ornek: "O ... biri." },
+        { deyim: "Başına çorap örmek", anlam: "Birine gizlice kötülük yapmak", ornek: "Ona tuzak ..." },
+
+        { deyim: "Yüreği ağzına gelmek", anlam: "Çok heyecanlanmak veya korkmak", ornek: "Kazayı görünce ..." },
+        { deyim: "Yüreği hop etmek", anlam: "Aniden korkmak", ornek: "Ses duyunca ..." },
+        { deyim: "İçi içine sığmamak", anlam: "Çok heyecanlanmak", ornek: "Tebrik edilince ..." },
+        { deyim: "İçi cız etmek", anlam: "Birden üzülmek", ornek: "Haberi duyunca ..." },
+        { deyim: "İçi gitmek", anlam: "Çok istemek", ornek: "O arabayı görünce ..." },
+        { deyim: "İçini dökmek", anlam: "Dertlerini anlatmak", ornek: "Arkadaşına ..." },
+        { deyim: "İçine sinmek", anlam: "Gönlü razı olmak", ornek: "Bu karar ..." },
+
+        { deyim: "Dili tutulmak", anlam: "Konuşamaz hâle gelmek", ornek: "Heyecandan ..." },
+        { deyim: "Dil dökmek", anlam: "İkna etmeye çalışmak", ornek: "Ona ..." },
+        { deyim: "Dile düşmek", anlam: "Herkes tarafından konuşulmak", ornek: "Bu olay ..." },
+        { deyim: "Dili yanmak", anlam: "Bir işten zarar görüp ders almak", ornek: "O işten ..." },
+        { deyim: "Dili çözülmek", anlam: "Konuşmaya başlamak", ornek: "İkinci şaraptan sonra ..." },
+        { deyim: "Dili varmamak", anlam: "Söylemeye kıyamamak", ornek: "Ona açılmaya ..." },
+        { deyim: "Dilinden düşürmemek", anlam: "Sürekli bahsetmek", ornek: "Başarıyı ..." },
+        { deyim: "Dili damağı kurumak", anlam: "Çok susamak", ornek: "Gezi boyunca ..." },
+
+        { deyim: "Can kulağıyla dinlemek", anlam: "Çok dikkatle dinlemek", ornek: "Dersi ..." },
+        { deyim: "Canına tak etmek", anlam: "Sabretme gücü kalmamak", ornek: "Baskılara ..." },
+        { deyim: "Canını dişine takmak", anlam: "Büyük çaba göstermek", ornek: "Bu iş için ..." },
+        { deyim: "Canı pahasına", anlam: "Her şeyi göze alarak", ornek: "Sevdası uğruna ..." },
+        { deyim: "Can evinden vurmak", anlam: "En hassas yerinden etkilemek", ornek: "Sözleri beni ..." },
+        { deyim: "Canı çıkmak", anlam: "Çok yorulmak", ornek: "Temizlikten ..." },
+
+        { deyim: "Aklı başına gelmek", anlam: "Hatasını anlayıp doğru davranmak", ornek: "Kazadan sonra ..." },
+        { deyim: "Aklı kalmak", anlam: "Bir şeyi düşünmeden edememek", ornek: "Orada ..." },
+        { deyim: "Aklına yatmak", anlam: "Mantıklı bulmak", ornek: "Bu teklif ..." },
+
+        { deyim: "Diş bilemek", anlam: "Öç almak istemek", ornek: "Düşmanına ..." },
+        { deyim: "Dişe dokunur", anlam: "Önemli, işe yarar", ornek: "Biraz ... bir şey söyle." },
+        { deyim: "Dişinin kovuğuna gitmemek", anlam: "Çok az gelmek", ornek: "Bu maaş ..." },
+        { deyim: "Diş göstermek", anlam: "Güçlü olduğunu belli etmek", ornek: "Düşmana ..." },
+        { deyim: "Dişini tırnağına takmak", anlam: "Büyük emek vermek", ornek: "Bu evi ..." },
+        { deyim: "Dişinden tırnağından artırmak", anlam: "Zorlukla para biriktirmek", ornek: "... ev aldı." },
+        { deyim: "Diş geçirememek", anlam: "Etkili olamamak", ornek: "Ona hiç ..." },
+
+        { deyim: "Karnı zil çalmak", anlam: "Çok acıkmak", ornek: "Sabahtan beri ..." },
+        { deyim: "Karnından konuşmak", anlam: "Belirsiz, anlaşılmaz konuşmak", ornek: "Neyin var, ..." },
+        { deyim: "Boğazına dizilmek", anlam: "Yemek yiyemez hâle gelmek", ornek: "Hastalıktan ..." },
+        { deyim: "Boğaz boğaza gelmek", anlam: "Kavga etmek", ornek: "İki komşu ..." },
+
+        { deyim: "Taş üstünde taş bırakmamak", anlam: "Tamamen yıkmak", ornek: "Kasabayı ..." },
+        { deyim: "Taşı gediğine koymak", anlam: "Gereken sözü yerinde söylemek", ornek: "Her zaman ..." },
+        { deyim: "Taşın altına elini koymak", anlam: "Zor sorumluluk almak", ornek: "Bu projede ..." },
+        { deyim: "Taş olsa çatlar", anlam: "Çok zor dayanılır", ornek: "Bu acıya ..." },
+
+        { deyim: "İpe un sermek", anlam: "Bahane bulup işi geciktirmek", ornek: "Sürekli ..." },
+        { deyim: "İpi koparmak", anlam: "İlişkiyi kesmek", ornek: "Sonunda ..." },
+        { deyim: "İpin ucunu kaçırmak", anlam: "Kontrolü kaybetmek", ornek: "İşler ..." },
+        { deyim: "İpe sapa gelmez", anlam: "Mantıksız, tutarsız", ornek: "... sözler." },
+
+        { deyim: "İki arada bir derede kalmak", anlam: "Kararsız kalmak", ornek: "Ne yapacağını bilemeyip ..." },
+        { deyim: "İki eli kanda olsa", anlam: "Ne olursa olsun", ornek: "... yardım eder." },
+        { deyim: "İki lafın belini kırmak", anlam: "Biraz sohbet etmek", ornek: "Bir ..." },
+        { deyim: "İki yakası bir araya gelmemek", anlam: "Geçim sıkıntısı çekmek", ornek: "Çalıştığı hâlde ..." },
+        { deyim: "İki gözü iki çeşme", anlam: "Çok ağlamak", ornek: "Haberi duyunca ..." },
+        { deyim: "İki dirhem bir çekirdek", anlam: "Çok şık giyinmiş", ornek: "Mezuniyette ..." },
+
+        { deyim: "Suya sabuna dokunmamak", anlam: "Riskli konulara girmemek", ornek: "Hep ..." },
+        { deyim: "Suyuna gitmek", anlam: "Birinin istediği gibi davranmak", ornek: "Müdürün ..." },
+        { deyim: "Su koyuvermek", anlam: "Sözünde durmamak", ornek: "Sözünde durmadı, ..." },
+        { deyim: "Suya düşmek", anlam: "Planın bozulması", ornek: "Tüm plan ..." },
+        { deyim: "Sudan ucuz", anlam: "Çok ucuz", ornek: "Bu mallar ..." },
+
+        { deyim: "Yol yordam bilmek", anlam: "Davranış kurallarını bilmek", ornek: "O ... biri." },
+        { deyim: "Yolunu gözlemek", anlam: "Gelmesini beklemek", ornek: "Ziyaretçinin ..." },
+
+        { deyim: "Ateş püskürmek", anlam: "Çok öfkelenmek", ornek: "Olayı duyunca ..." },
+        { deyim: "Ateşle oynamak", anlam: "Tehlikeli iş yapmak", ornek: "Uyuşturucu ..." },
+        { deyim: "Ateş pahası", anlam: "Çok pahalı", ornek: "Bu araba ..." },
+        { deyim: "Ateşe körükle gitmek", anlam: "Gerginliği artırmak", ornek: "Sakın ..." },
+        { deyim: "Ateşten gömlek", anlam: "Çok zor durum", ornek: "Bu iş bir ..." },
+
+        { deyim: "İğneyle kuyu kazmak", anlam: "Çok zor ve yavaş iş yapmak", ornek: "Bürokrasi ..." },
+        { deyim: "İğne ipliğe dönmek", anlam: "Çok zayıflamak", ornek: "Hastalıktan ..." },
+
+        { deyim: "Kılını kıpırdatmamak", anlam: "Hiç çaba göstermemek", ornek: "O ..." },
+        { deyim: "Kılı kırk yarmak", anlam: "Çok titiz davranmak", ornek: "O ..." },
+        { deyim: "Kılıfına uydurmak", anlam: "Yanlış bir işi uygun gibi göstermek", ornek: "Her işi ..." },
+
+        // ─── YENİ EKLENENLER (TEKRAR OLMAYANLAR) ────────────────────
+        { deyim: "Ağzı dili kurumak", anlam: "Heyecan, korku ya da susuzluktan konuşamaz hâle gelmek", ornek: "Sahnede ..." },
+        { deyim: "Ağzını hayra açmak", anlam: "Kötü şeyler söylememesi için birini uyarmak", ornek: "Şimdi ... da kötü konuşma." },
+        { deyim: "Aklını peynir ekmekle yemek", anlam: "Mantıksız davranmak, akılsızlık etmek", ornek: "Ne ... böyle?" },
+        { deyim: "Allem edip kallem etmek", anlam: "Türlü hilelerle bir işi oldurmak", ornek: "... bu işi halletti." },
+        { deyim: "Altından Çapanoğlu çıkmak", anlam: "Bir işin içinden beklenmedik sorun çıkmak", ornek: "Her işin ..." },
+        { deyim: "Astarı yüzünden pahalı olmak", anlam: "Masrafı kazancından fazla olmak", ornek: "Bu işin ..." },
+        { deyim: "Avucunu yalamak", anlam: "Beklediğini elde edememek", ornek: "Bekledi, bekledi ..." },
+        { deyim: "Ayak sürümek", anlam: "Bir işi geciktirmek, isteksiz davranmak", ornek: "Sürekli ..." },
+        { deyim: "Bağrına taş basmak", anlam: "Acıya katlanmak, sabretmek", ornek: "Acıya rağmen ..." },
+        { deyim: "Başı kazan gibi olmak", anlam: "Gürültüden ya da yorgunluktan sersemlemek", ornek: "Kafam ..." },
+        { deyim: "Başına devlet kuşu konmak", anlam: "Beklenmedik büyük bir şansa ulaşmak", ornek: "Zavallıya ..." },
+        { deyim: "Başında kavak yeli esmek", anlam: "Gençlik hevesleriyle düşüncesiz davranmak", ornek: "Daha ..." },
+        { deyim: "Bindiği dalı kesmek", anlam: "Kendi yararına olan şeyi yok etmek", ornek: "Kendi ayağına ..." },
+        { deyim: "Bir baltaya sap olamamak", anlam: "İşe yarar bir duruma gelememek", ornek: "Yıllardır ..." },
+        { deyim: "Bir çuval inciri berbat etmek", anlam: "İyi giden bir işi bozmak", ornek: "Her işi ..." },
+        { deyim: "Bir dirhem bal için bir çeki keçiboynuzu çiğnemek", anlam: "Az yarar için çok zahmet çekmek", ornek: "Bu işte ..." },
+        { deyim: "Bir dokun bin ah işit", anlam: "Çok dertli kimseler için kullanılır", ornek: "O adama ..." },
+        { deyim: "Bir pire için yorgan yakmak", anlam: "Küçük bir sorun yüzünden büyük zarar vermek", ornek: "... ne gerek vardı?" },
+        { deyim: "Bir taşla iki kuş vurmak", anlam: "Tek işle iki sonuç elde etmek", ornek: "... hem iş hem okul." },
+        { deyim: "Boyunun ölçüsünü almak", anlam: "Haddini anlamak", ornek: "Onun ..." },
+        { deyim: "Cebi delik olmak", anlam: "Parasını tutamamak, savurgan olmak", ornek: "Ne alsa ..." },
+        { deyim: "Çam devirmek", anlam: "Uygunsuz, kırıcı veya pot kıran söz söylemek", ornek: "Toplantıda ..." },
+        { deyim: "Çanak tutmak", anlam: "Birinin kötü davranışına ortam hazırlamak", ornek: "Ona ..." },
+        { deyim: "Çizmeyi aşmak", anlam: "Yetkisini veya haddini aşmak", ornek: "Müdür ..." },
+        { deyim: "Çorbada tuzu bulunmak", anlam: "Bir işe küçük de olsa katkıda bulunmak", ornek: "Bu projede ..." },
+        { deyim: "Dağ fare doğurmak", anlam: "Büyük beklentiden küçük sonuç çıkmak", ornek: "Herkes çok bekledi ama ..." },
+        { deyim: "Damarına basmak", anlam: "Kızdıracak noktaya dokunmak", ornek: "Onun ..." },
+        { deyim: "Dikine gitmek", anlam: "İnatla ters davranmak", ornek: "Ne dersen de ..." },
+        { deyim: "Dizginleri ele almak", anlam: "Yönetimi kendi eline geçirmek", ornek: "Başkan ..." },
+        { deyim: "Dört ayak üstüne düşmek", anlam: "Şans eseri kötü durumdan kurtulmak", ornek: "Kazadan ..." },
+        { deyim: "Ecel terleri dökmek", anlam: "Çok korkmak, büyük sıkıntı yaşamak", ornek: "Sınavda ..." },
+        { deyim: "El etek öpmek", anlam: "Birinden yardım veya çıkar umarak aşırı saygı göstermek", ornek: "Müdüre ..." },
+        { deyim: "Eline koz vermek", anlam: "Karşı tarafın kullanabileceği fırsat sunmak", ornek: "Ona sakın ..." },
+        { deyim: "Elini sıcak sudan soğuk suya sokmamak", anlam: "Hiç zahmet çekmemek", ornek: "O ..." },
+        { deyim: "Etekleri tutuşmak", anlam: "Telaşa kapılmak", ornek: "Haber gelince ..." },
+        { deyim: "Feleğin çemberinden geçmek", anlam: "Hayatta çok deneyim kazanmak", ornek: "O ..." },
+        { deyim: "Fincancı katırlarını ürkütmek", anlam: "Güçlü kişileri kızdıracak söz söylemek", ornek: "Sakın ..." },
+        { deyim: "Gemi azıya almak", anlam: "Söz dinlemez, taşkın davranmak", ornek: "Çocuk ..." },
+        { deyim: "Gönlünden kopmak", anlam: "İçinden gelerek vermek veya yapmak", ornek: "Hediye ..." },
+        { deyim: "Gözüne kestirmek", anlam: "Bir şeyi uygun görüp hedeflemek", ornek: "O arabayı ..." },
+        { deyim: "Gözünü budaktan sakınmamak", anlam: "Tehlikeden çekinmemek", ornek: "O ..." },
+        { deyim: "Gününü gün etmek", anlam: "Rahatına bakıp eğlenmek", ornek: "Parayı bulunca ..." },
+        { deyim: "Habbeyi kubbe yapmak", anlam: "Küçük şeyi büyütmek, abartmak", ornek: "Ne ..." },
+        { deyim: "Havanda su dövmek", anlam: "Boşuna uğraşmak", ornek: "Bu konuda ..." },
+        { deyim: "İnce eleyip sık dokumak", anlam: "Çok titiz davranmak", ornek: "Her işte ..." },
+        { deyim: "İşini kılıfına uydurmak", anlam: "Yanlış işi uygun göstererek yapmak", ornek: "Her ..." },
+        { deyim: "Kabak tadı vermek", anlam: "Bıktırmak, usandırmak", ornek: "Bu iş ..." },
+        { deyim: "Kafasına koymak", anlam: "Bir şeyi yapmaya kesin karar vermek", ornek: "O ..." },
+        { deyim: "Kafasının tası atmak", anlam: "Çok sinirlenmek", ornek: "Haksızlık görünce ..." },
+        { deyim: "Kan kusup kızılcık şerbeti içtim demek", anlam: "Sıkıntısını belli etmemek", ornek: "Zor da olsa ..." },
+        { deyim: "Karda gezip izini belli etmemek", anlam: "Bir işi gizlice ve ustalıkla yapmak", ornek: "Casus ..." },
+        { deyim: "Kazan kaldırmak", anlam: "Başkaldırmak, isyan etmek", ornek: "İşçiler ..." },
+        { deyim: "Kendi göbeğini kendi kesmek", anlam: "İşini kendi başına halletmek", ornek: "Artık ..." },
+        { deyim: "Kesenin ağzını açmak", anlam: "Bol para harcamak", ornek: "Düğünde ..." },
+        { deyim: "Külahları değişmek", anlam: "Arası açılmak, bozuşmak", ornek: "Eski dostlar ..." },
+        { deyim: "Lafı gediğine koymak", anlam: "Sözü tam yerinde söylemek", ornek: "Her zaman ..." },
+        { deyim: "Mangalda kül bırakmamak", anlam: "Abartılı biçimde övünmek", ornek: "Her işte ..." },
+        { deyim: "Mumla aramak", anlam: "Birini veya şeyi çok özlemek, arar olmak", ornek: "Seni ..." },
+        { deyim: "Nabza göre şerbet vermek", anlam: "Karşıdakine göre davranmak", ornek: "Herkese ..." },
+        { deyim: "Ok yaydan çıkmak", anlam: "Artık geri dönüşü olmayan duruma gelmek", ornek: "Artık ..." },
+        { deyim: "Pabucu dama atılmak", anlam: "Eski önemini yitirmek", ornek: "Eski çalışanın ..." },
+        { deyim: "Papara yemek", anlam: "Azarlanmak", ornek: "Patrondan ..." },
+        { deyim: "Postu sermek", anlam: "Bir yerde uzun süre kalmak", ornek: "Burada ..." },
+        { deyim: "Tereciye tere satmak", anlam: "Bir işi o işin uzmanına öğretmeye kalkmak", ornek: "Bana ..." },
+        { deyim: "Zurnanın zırt dediği yer", anlam: "İşin en önemli ve kritik noktası", ornek: "Burası ..." }
     ];
 
     // ─── OYUN DURUMU ──────────────────────────────────────────────────
@@ -399,7 +582,6 @@
     let zamanlayici = null;
     const SET_ADET = 10;
 
-    // ─── ALKIŞ EFEKTİ (ses + konfeti) ─────────────────────────────────
     let alkisCtx = null;
     function alkisCal() {
         try {
@@ -422,7 +604,7 @@
             const gain = ctx.createGain(); gain.gain.value = 0.9;
             src.connect(filt); filt.connect(gain); gain.connect(ctx.destination);
             src.start();
-        } catch (e) { /* ses desteklenmiyorsa sessizce geç */ }
+        } catch (e) { /* sessiz */ }
     }
 
     function konfetiFirlat() {
@@ -468,7 +650,6 @@
         const hepsi = [...DEYIMLER];
         const secilen = karistir(hepsi).slice(0, SET_ADET);
         return secilen.map(s => {
-            // 2 yanlış deyim bul (kendi deyimi dışında)
             const digerDeyimler = DEYIMLER.filter(d => d.deyim !== s.deyim).map(d => d.deyim);
             const yanlis = karistir(digerDeyimler).slice(0, 2);
             const secenekler = karistir([s.deyim, ...yanlis]);
