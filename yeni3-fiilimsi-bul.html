@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiilimsileri Bulma Oyunu</title>
+<style>
+  :root{
+    --ink:#2b2350;
+    --paper:#f6f4ff;
+    --card:#ffffff;
+    --violet:#6c4ff0;
+    --violet-dark:#5238c9;
+    --mint:#19b884;
+    --coral:#f05e5e;
+    --amber:#f5a623;
+    --line:#e5e0f7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:linear-gradient(160deg,#ece8ff 0%,var(--paper) 45%,#fdf7ee 100%);
+    min-height:100vh;color:var(--ink);padding:20px 14px 60px;
+  }
+  .wrap{max-width:980px;margin:0 auto;}
+  header{text-align:center;margin-bottom:16px;}
+  header h1{font-size:2rem;letter-spacing:-.5px;}
+  header p{color:#6b639a;margin-top:4px;font-size:1.05rem;}
+
+  .scoreboard{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;}
+  .stat{
+    background:var(--card);border:2px solid var(--line);border-radius:14px;
+    padding:8px 18px;min-width:120px;text-align:center;box-shadow:0 3px 0 var(--line);
+  }
+  .stat .label{font-size:.78rem;color:#6b639a;text-transform:uppercase;letter-spacing:.5px;}
+  .stat .value{font-size:1.5rem;font-weight:800;margin-top:2px;}
+  #score.negative{color:var(--coral);}
+  #score.positive{color:var(--mint);}
+  #wrongCount{color:var(--coral);}
+  #foundCount{color:var(--mint);}
+
+  .progress-outer{background:#e6e1f8;border-radius:99px;height:14px;overflow:hidden;margin-bottom:14px;}
+  .progress-inner{
+    height:100%;width:0%;border-radius:99px;
+    background:linear-gradient(90deg,var(--violet),var(--mint));
+    transition:width .35s ease;
+  }
+
+  .instructions{
+    background:#fff8ec;border:2px dashed var(--amber);border-radius:14px;
+    padding:10px 16px;margin-bottom:18px;font-size:.92rem;line-height:1.5;
+  }
+  .instructions strong{color:#b57708;}
+
+  /* --- Cümleler: büyük yazı, 3'lü görünüm --- */
+  #sentences{display:flex;flex-direction:column;gap:16px;}
+  .sentence-card{
+    background:var(--card);border:2px solid var(--line);border-radius:18px;
+    padding:22px 26px;line-height:2.4;font-size:1.5rem;
+    box-shadow:0 4px 0 var(--line);
+    animation:slideIn .45s ease;
+  }
+  @keyframes slideIn{
+    from{opacity:0;transform:translateY(30px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  .sentence-card.leaving{
+    animation:slideOut .5s ease forwards;
+  }
+  @keyframes slideOut{
+    from{opacity:1;transform:translateY(0);max-height:400px;margin-bottom:0;}
+    to{opacity:0;transform:translateY(-40px);max-height:0;padding-top:0;padding-bottom:0;margin-bottom:-16px;border-width:0;}
+  }
+  .sentence-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:32px;height:32px;border-radius:50%;background:var(--violet);color:#fff;
+    font-size:.95rem;font-weight:700;margin-right:10px;vertical-align:middle;
+  }
+  .word{cursor:pointer;padding:2px 5px;border-radius:8px;transition:background .15s;}
+  .word:hover{background:#ece7ff;}
+  .word.correct{background:#d9f6ea;cursor:default;font-weight:700;}
+  .word.correct:hover{background:#d9f6ea;}
+  .word.correct::after{
+    content:attr(data-badge);
+    font-size:.7rem;font-weight:700;color:#fff;border-radius:6px;
+    padding:2px 7px;margin-left:6px;vertical-align:middle;white-space:nowrap;
+  }
+  .word.correct.isim::after{background:var(--violet);}
+  .word.correct.sifat::after{background:var(--amber);}
+  .word.correct.zarf::after{background:var(--mint);}
+  .word.shake{animation:shake .35s;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-4px);}
+    75%{transform:translateX(4px);}
+  }
+
+  /* Modallar */
+  .overlay{
+    position:fixed;inset:0;background:rgba(35,26,74,.55);
+    display:none;align-items:center;justify-content:center;padding:16px;z-index:50;
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:#fff;border-radius:18px;padding:28px 26px;max-width:440px;width:100%;
+    text-align:center;box-shadow:0 18px 50px rgba(35,26,74,.3);
+    animation:pop .22s ease;
+  }
+  @keyframes pop{from{transform:scale(.9);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .modal h2{font-size:1.35rem;margin-bottom:6px;}
+  .modal .picked-word{
+    display:inline-block;background:#ece7ff;color:var(--violet-dark);
+    border-radius:8px;padding:5px 14px;font-weight:800;margin:10px 0 18px;font-size:1.3rem;
+  }
+  .type-buttons{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+  .type-btn{
+    border:2px solid var(--line);background:#faf9ff;border-radius:12px;
+    padding:14px;font-size:1.1rem;font-weight:700;color:var(--ink);cursor:pointer;
+    transition:transform .12s,border-color .12s;font-family:inherit;
+  }
+  .type-btn:hover{transform:translateY(-2px);border-color:var(--violet);}
+  .btn{
+    border:none;border-radius:12px;padding:12px 24px;font-size:1rem;font-weight:700;
+    cursor:pointer;font-family:inherit;
+  }
+  .btn-ghost{background:#eee9ff;color:var(--violet-dark);}
+  .btn-primary{background:var(--violet);color:#fff;box-shadow:0 3px 0 var(--violet-dark);}
+  .btn-danger{background:var(--coral);color:#fff;box-shadow:0 3px 0 #c94040;}
+
+  .modal.wrong h2{color:var(--coral);}
+  .modal.gameover h2{font-size:1.7rem;color:var(--coral);}
+  .modal.win h2{font-size:1.7rem;color:var(--mint);}
+  .modal p{color:#5c5488;line-height:1.5;margin-bottom:12px;font-size:1.05rem;}
+  .big-score{font-size:2.4rem;font-weight:800;margin:8px 0 18px;}
+
+  .feedback{
+    position:fixed;left:50%;transform:translateX(-50%);bottom:28px;
+    background:var(--ink);color:#fff;border-radius:99px;padding:12px 26px;
+    font-weight:700;font-size:1.1rem;opacity:0;transition:opacity .25s;
+    pointer-events:none;z-index:60;
+  }
+  .feedback.show{opacity:1;}
+  .feedback.good{background:var(--mint);}
+  .feedback.bad{background:var(--coral);}
+
+  /* Alkış emoji efekti */
+  .clap-emoji{
+    position:fixed;font-size:2.2rem;pointer-events:none;z-index:70;
+    animation:clapFly 1.3s ease-out forwards;
+  }
+  @keyframes clapFly{
+    0%{opacity:0;transform:translateY(0) scale(.5) rotate(0deg);}
+    15%{opacity:1;}
+    100%{opacity:0;transform:translateY(-140px) scale(1.3) rotate(20deg);}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🎯 Fiilimsileri Bulma Oyunu</h1>
+    <p>Fiilimsi olan kelimeleri bul, türünü belirle!</p>
+  </header>
+
+  <div class="scoreboard">
+    <div class="stat">
+      <div class="label">🏆 Puan</div>
+      <div class="value" id="score">0</div>
+    </div>
+    <div class="stat">
+      <div class="label">❌ Yanlış Hak</div>
+      <div class="value"><span id="wrongCount">0</span>/5</div>
+    </div>
+    <div class="stat">
+      <div class="label">✅ Bulunan</div>
+      <div class="value"><span id="foundCount">0</span>/<span id="totalCount">0</span></div>
+    </div>
+  </div>
+
+  <div class="progress-outer"><div class="progress-inner" id="progressBar"></div></div>
+
+  <div class="instructions">
+    <strong>📝 Yönerge:</strong> Cümlelerdeki fiilimsi olan kelimelere tıklayın ve türünü seçin.
+    Doğru cevap <strong>+5</strong>, yanlış cevap <strong>−5 puan</strong>. 5 yanlış yaparsanız oyun başa döner!
+    Bir cümledeki tüm fiilimsiler bulununca yeni cümle gelir.
+  </div>
+
+  <div id="sentences"></div>
+</div>
+
+<!-- Tür seçme modali -->
+<div class="overlay" id="typeOverlay">
+  <div class="modal">
+    <h2>Bu kelime hangi fiilimsi türündedir?</h2>
+    <div class="picked-word" id="pickedWord"></div>
+    <div class="type-buttons">
+      <button class="type-btn" data-type="isim">📝 İsim-Fiil</button>
+      <button class="type-btn" data-type="sifat">🎨 Sıfat-Fiil</button>
+      <button class="type-btn" data-type="zarf">⚡ Zarf-Fiil</button>
+    </div>
+    <button class="btn btn-ghost" id="cancelBtn">İptal</button>
+  </div>
+</div>
+
+<!-- Fiilimsi değil modali -->
+<div class="overlay" id="wrongOverlay">
+  <div class="modal wrong">
+    <h2>❌ Bu kelime fiilimsi değil!</h2>
+    <p>"<span id="wrongWord"></span>" kelimesi fiilimsi değildir.</p>
+    <p><strong>−5 puan kaybettiniz!</strong></p>
+    <button class="btn btn-danger" id="wrongOkBtn">Tamam, anladım</button>
+  </div>
+</div>
+
+<!-- Oyun bitti modali -->
+<div class="overlay" id="gameOverOverlay">
+  <div class="modal gameover">
+    <h2>💥 Oyun Bitti!</h2>
+    <p>5 yanlış hak doldu!</p>
+    <div class="big-score">Toplam Puan: <span id="finalScore">0</span></div>
+    <button class="btn btn-primary" id="restartBtn">🔄 Tekrar Oyna</button>
+  </div>
+</div>
+
+<!-- Kazandın modali -->
+<div class="overlay" id="winOverlay">
+  <div class="modal win">
+    <h2>🎉 Tebrikler!</h2>
+    <p>Tüm fiilimsileri buldun!</p>
+    <div class="big-score">Toplam Puan: <span id="winScore">0</span></div>
+    <button class="btn btn-primary" id="winRestartBtn">🔄 Tekrar Oyna</button>
+  </div>
+</div>
+
+<div class="feedback" id="feedback"></div>
+
+<script>
+const SENTENCES = [
+  [
+    {w:"Yapay"},{w:"zeka"},{w:"sistemleri"},{w:"sürekli"},{w:"gelişerek",t:"zarf"},{w:"insanların"},{w:"hayatını"},{w:"kolaylaştırmayı",t:"isim"},{w:"amaçlıyor"},{w:"ve"},{w:"bu"},{w:"süreçte"},{w:"etik"},{w:"kuralları"},{w:"göz"},{w:"ardı"},{w:"etmeden",t:"zarf"},{w:"ilerlemeye",t:"isim"},{w:"çalışıyor."}
+  ],
+  [
+    {w:"Astronotlar,"},{w:"bilinmeyen",t:"sifat"},{w:"galaksileri"},{w:"keşfetmek",t:"isim"},{w:"için"},{w:"yıllarca"},{w:"süren",t:"sifat"},{w:"zorlu"},{w:"eğitimlerden"},{w:"geçtikten",t:"zarf"},{w:"sonra"},{w:"uzay"},{w:"istasyonunda"},{w:"görev"},{w:"yapmaya",t:"isim"},{w:"hak"},{w:"kazandılar."}
+  ],
+  [
+    {w:"Arkeologlar,"},{w:"toprağın"},{w:"derinliklerinde"},{w:"saklı"},{w:"kalmış",t:"sifat"},{w:"antik"},{w:"şehir"},{w:"kalıntılarını"},{w:"gün"},{w:"yüzüne"},{w:"çıkarırken",t:"zarf"},{w:"geçmiş"},{w:"medeniyetlerin"},{w:"sırlarını"},{w:"çözmeyi",t:"isim"},{w:"başardılar."}
+  ],
+  [
+    {w:"İklim"},{w:"değişikliğiyle"},{w:"mücadele"},{w:"eden",t:"sifat"},{w:"çevre"},{w:"aktivistleri,"},{w:"ormanları"},{w:"korumak",t:"isim"},{w:"amacıyla"},{w:"düzenlenen",t:"sifat"},{w:"kampanyalara"},{w:"katılarak",t:"zarf"},{w:"gelecek"},{w:"nesillere"},{w:"temiz"},{w:"bir"},{w:"dünya"},{w:"bırakmayı",t:"isim"},{w:"hedefliyorlar."}
+  ],
+  [
+    {w:"Ünlü"},{w:"besteci,"},{w:"piyanonun"},{w:"tuşlarına"},{w:"dokunarak",t:"zarf"},{w:"bestelediği",t:"sifat"},{w:"o"},{w:"muazzam"},{w:"senfoniyi"},{w:"dinleyen",t:"sifat"},{w:"herkesi"},{w:"derin"},{w:"bir"},{w:"hüzne"},{w:"ve"},{w:"aynı"},{w:"zamanda"},{w:"umuda"},{w:"boğdu."}
+  ],
+  [
+    {w:"İnsanlar,"},{w:"varoluşun"},{w:"anlamını"},{w:"sorgulamaktan",t:"isim"},{w:"vazgeçmeyip",t:"zarf"},{w:"hayatın"},{w:"getirdiği",t:"sifat"},{w:"tüm"},{w:"zorluklara"},{w:"rağmen"},{w:"umutlarını"},{w:"kaybetmeden",t:"zarf"},{w:"yollarına"},{w:"devam"},{w:"etmeyi",t:"isim"},{w:"öğrenmelidir."}
+  ],
+  [
+    {w:"Küresel"},{w:"piyasalardaki"},{w:"ani"},{w:"dalgalanmaları"},{w:"öngöremeyen",t:"sifat"},{w:"yatırımcılar,"},{w:"birikimlerini"},{w:"doğru"},{w:"yönetemedikleri",t:"sifat"},{w:"için"},{w:"kısa"},{w:"sürede"},{w:"büyük"},{w:"finansal"},{w:"kayıplarla"},{w:"karşılaşmak",t:"isim"},{w:"zorunda"},{w:"kaldılar."}
+  ],
+  [
+    {w:"Maraton"},{w:"koşucusu,"},{w:"bitiş"},{w:"çizgisine"},{w:"yaklaşırken",t:"zarf"},{w:"bacaklarındaki"},{w:"şiddetli"},{w:"ağrıya"},{w:"aldırmadan",t:"zarf"},{w:"son"},{w:"hızla"},{w:"koşarak",t:"zarf"},{w:"kariyerinin"},{w:"en"},{w:"büyük"},{w:"zaferini"},{w:"kazanmayı",t:"isim"},{w:"başardı."}
+  ],
+  [
+    {w:"Yazar,"},{w:"yıllarca"},{w:"süren",t:"sifat"},{w:"araştırmalar"},{w:"sonucunda"},{w:"topladığı",t:"sifat"},{w:"belgeleri"},{w:"kullanarak",t:"zarf"},{w:"yazdığı",t:"sifat"},{w:"o"},{w:"destansı"},{w:"romanla"},{w:"edebiyat"},{w:"dünyasında"},{w:"kalıcı"},{w:"bir"},{w:"iz"},{w:"bırakmayı",t:"isim"},{w:"başardı."}
+  ],
+  [
+    {w:"Dünyanın"},{w:"farklı"},{w:"coğrafyalarını"},{w:"gezip",t:"zarf"},{w:"yerel"},{w:"lezzetleri"},{w:"tatmayı",t:"isim"},{w:"seven",t:"sifat"},{w:"gezgin,"},{w:"yeni"},{w:"tarifler"},{w:"denemek",t:"isim"},{w:"için"},{w:"mutfağında"},{w:"saatlerce"},{w:"vakit"},{w:"geçirmekten",t:"isim"},{w:"asla"},{w:"sıkılmıyor."}
+  ]
+];
+
+const BADGES = {isim:"İSİM-FİİL", sifat:"SIFAT-FİİL", zarf:"ZARF-FİİL"};
+const VISIBLE = 3; // aynı anda ekranda görünen cümle sayısı
+
+let score = 0, wrong = 0, found = 0, total = 0, activeSpan = null, nextIndex = 0;
+
+const $ = id => document.getElementById(id);
+
+/* ---------- Alkış sesi (Web Audio ile sentezlenir) ---------- */
+let audioCtx = null;
+function ensureAudio(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if(audioCtx.state === "suspended") audioCtx.resume();
+  return audioCtx;
+}
+function playClap(ctx, when, gainVal){
+  const dur = 0.09;
+  const buf = ctx.createBuffer(1, ctx.sampleRate*dur, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for(let i=0;i<d.length;i++){
+    d[i] = (Math.random()*2-1) * Math.pow(1 - i/d.length, 2.2);
+  }
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const bp = ctx.createBiquadFilter();
+  bp.type = "bandpass";
+  bp.frequency.value = 900 + Math.random()*900;
+  bp.Q.value = 0.9;
+  const g = ctx.createGain();
+  g.gain.value = gainVal;
+  src.connect(bp).connect(g).connect(ctx.destination);
+  src.start(when);
+}
+function playApplause(){
+  try{
+    const ctx = ensureAudio();
+    const t0 = ctx.currentTime + 0.02;
+    // 1.1 saniyeye yayılmış rastgele el çırpma sesleri
+    const claps = 26;
+    for(let i=0;i<claps;i++){
+      const when = t0 + Math.random()*1.1;
+      playClap(ctx, when, 0.10 + Math.random()*0.12);
+    }
+    // birkaç belirgin ön alkış
+    playClap(ctx, t0, 0.28);
+    playClap(ctx, t0+0.12, 0.24);
+    playClap(ctx, t0+0.25, 0.26);
+  }catch(e){ /* ses desteklenmiyorsa sessizce geç */ }
+}
+function clapEmojis(x, y){
+  const emojis = ["👏","🎉","👏","✨","👏"];
+  emojis.forEach((em,i)=>{
+    const el = document.createElement("div");
+    el.className = "clap-emoji";
+    el.textContent = em;
+    el.style.left = (x - 40 + Math.random()*80) + "px";
+    el.style.top = (y - 10 + Math.random()*20) + "px";
+    el.style.animationDelay = (i*0.06) + "s";
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 1600);
+  });
+}
+
+/* ---------- Cümle oluşturma ---------- */
+function makeCard(i){
+  const tokens = SENTENCES[i];
+  const card = document.createElement("div");
+  card.className = "sentence-card";
+  card.dataset.index = i;
+  const num = document.createElement("span");
+  num.className = "sentence-num";
+  num.textContent = i+1;
+  card.appendChild(num);
+  tokens.forEach(tok=>{
+    const span = document.createElement("span");
+    span.className = "word";
+    span.textContent = tok.w;
+    if(tok.t) span.dataset.type = tok.t;
+    span.addEventListener("click", ()=>onWordClick(span));
+    card.appendChild(span);
+    card.appendChild(document.createTextNode(" "));
+  });
+  return card;
+}
+
+function initGame(){
+  const box = $("sentences");
+  box.innerHTML = "";
+  nextIndex = 0;
+  total = SENTENCES.reduce((a,s)=>a + s.filter(t=>t.t).length, 0);
+  $("totalCount").textContent = total;
+  for(let k=0; k<Math.min(VISIBLE, SENTENCES.length); k++){
+    box.appendChild(makeCard(nextIndex++));
+  }
+}
+
+function advanceSentence(card){
+  card.classList.add("leaving");
+  setTimeout(()=>{
+    card.remove();
+    if(nextIndex < SENTENCES.length){
+      $("sentences").appendChild(makeCard(nextIndex++));
+    }
+  }, 480);
+}
+
+/* ---------- Oyun mantığı ---------- */
+function onWordClick(span){
+  if(span.classList.contains("correct")) return;
+  if(span.closest(".sentence-card").classList.contains("leaving")) return;
+  if(!span.dataset.type){
+    span.classList.add("shake");
+    setTimeout(()=>span.classList.remove("shake"),400);
+    $("wrongWord").textContent = span.textContent.replace(/[.,!?]$/,"");
+    $("wrongOverlay").classList.add("open");
+    applyPenalty();
+    return;
+  }
+  activeSpan = span;
+  $("pickedWord").textContent = span.textContent.replace(/[.,!?]$/,"");
+  $("typeOverlay").classList.add("open");
+}
+
+function applyPenalty(){
+  score -= 5;
+  wrong++;
+  updateStats();
+  showFeedback("−5 puan!", "bad");
+  if(wrong >= 5){
+    setTimeout(()=>{
+      $("wrongOverlay").classList.remove("open");
+      $("typeOverlay").classList.remove("open");
+      $("finalScore").textContent = score;
+      $("gameOverOverlay").classList.add("open");
+    }, 600);
+  }
+}
+
+function updateStats(){
+  const s = $("score");
+  s.textContent = score;
+  s.className = "value " + (score>0?"positive":score<0?"negative":"");
+  $("wrongCount").textContent = wrong;
+  $("foundCount").textContent = found;
+  $("progressBar").style.width = (total? (found/total*100):0) + "%";
+}
+
+function showFeedback(text, cls){
+  const f = $("feedback");
+  f.textContent = text;
+  f.className = "feedback show " + cls;
+  clearTimeout(f._t);
+  f._t = setTimeout(()=>f.classList.remove("show"), 1200);
+}
+
+document.querySelectorAll(".type-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    if(!activeSpan) return;
+    const chosen = btn.dataset.type;
+    const real = activeSpan.dataset.type;
+    $("typeOverlay").classList.remove("open");
+    if(chosen === real){
+      score += 5; found++;
+      activeSpan.classList.add("correct", real);
+      activeSpan.dataset.badge = BADGES[real];
+      updateStats();
+      showFeedback("+5 puan! 🎉", "good");
+      // Alkış sesi + emoji efekti
+      playApplause();
+      const r = activeSpan.getBoundingClientRect();
+      clapEmojis(r.left + r.width/2, r.top);
+      // Cümle tamamlandı mı?
+      const card = activeSpan.closest(".sentence-card");
+      const remaining = card.querySelectorAll(".word[data-type]:not(.correct)").length;
+      if(remaining === 0){
+        setTimeout(()=>advanceSentence(card), 900);
+      }
+      if(found === total){
+        setTimeout(()=>{
+          $("winScore").textContent = score;
+          $("winOverlay").classList.add("open");
+        }, 900);
+      }
+    } else {
+      activeSpan.classList.add("shake");
+      setTimeout(()=>activeSpan.classList.remove("shake"),400);
+      applyPenalty();
+      if(wrong < 5) showFeedback("Yanlış tür! −5 puan", "bad");
+    }
+    activeSpan = null;
+  });
+});
+
+$("cancelBtn").addEventListener("click", ()=>{
+  activeSpan = null;
+  $("typeOverlay").classList.remove("open");
+});
+$("wrongOkBtn").addEventListener("click", ()=>{
+  $("wrongOverlay").classList.remove("open");
+});
+
+function restart(){
+  score = 0; wrong = 0; found = 0; activeSpan = null;
+  $("gameOverOverlay").classList.remove("open");
+  $("winOverlay").classList.remove("open");
+  initGame();
+  updateStats();
+}
+$("restartBtn").addEventListener("click", restart);
+$("winRestartBtn").addEventListener("click", restart);
+
+initGame();
+updateStats();
+</script>
+</body>
+</html>
