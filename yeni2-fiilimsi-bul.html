@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiilimsileri Bulma Etkinliği</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            padding: 5px 15px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .score { background: #27ae60; }
+        .wrong { background: #e74c3c; }
+
+        .instructions {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 5px solid #ffc107;
+            margin: 20px;
+            border-radius: 10px;
+            color: #856404;
+        }
+
+        .sentence-container {
+            padding: 20px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .sentence-number {
+            background: #9b59b6;
+            color: white;
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .sentence {
+            font-size: 18px;
+            line-height: 2.5;
+            color: #2c3e50;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .word {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 2px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .word.clickable {
+            cursor: pointer;
+        }
+
+        .word.clickable:hover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .word.non-clickable {
+            cursor: default;
+            color: #2c3e50;
+        }
+
+        .word.found {
+            background: #d4edda;
+            border-color: #28a745;
+            cursor: default;
+            animation: foundPulse 0.6s ease;
+        }
+
+        .word.wrong-click {
+            background: #f8d7da;
+            border-color: #dc3545;
+            animation: shake 0.6s ease;
+        }
+
+        .word.not-fiilimsi {
+            background: #f8d7da;
+            border-color: #dc3545;
+            animation: shake 0.6s ease;
+        }
+
+        @keyframes foundPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            animation: modalPop 0.3s ease;
+        }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 24px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .option-btn {
+            padding: 15px 30px;
+            font-size: 16px;
+            border: 3px solid #3498db;
+            background: white;
+            color: #3498db;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .option-btn:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .option-btn.isim { border-color: #e67e22; color: #e67e22; }
+        .option-btn.isim:hover { background: #e67e22; color: white; }
+
+        .option-btn.sifat { border-color: #9b59b6; color: #9b59b6; }
+        .option-btn.sifat:hover { background: #9b59b6; color: white; }
+
+        .option-btn.zarf { border-color: #16a085; color: #16a085; }
+        .option-btn.zarf:hover { background: #16a085; color: white; }
+
+        .close-modal {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .game-over {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+
+        .game-over h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #e74c3c;
+        }
+
+        .restart-btn {
+            padding: 20px 40px;
+            font-size: 20px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            background: #2ecc71;
+            transform: scale(1.1);
+        }
+
+        .effect-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 100px;
+            z-index: 1500;
+            pointer-events: none;
+            animation: effectPop 1s ease forwards;
+        }
+
+        @keyframes effectPop {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #ecf0f1;
+            margin: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #11998e, #38ef7d);
+            transition: width 0.3s ease;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            position: absolute;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Fiilimsileri Bulma Oyunu</h1>
+            <p>Fiilimsi olan kelimeleri bul, türünü belirle!</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <span>🏆 Puan:</span>
+                <span class="stat-value score" id="score">0</span>
+            </div>
+            <div class="stat-item">
+                <span>❌ Yanlış Hak:</span>
+                <span class="stat-value wrong" id="wrongCount">0/5</span>
+            </div>
+            <div class="stat-item">
+                <span>✅ Bulunan:</span>
+                <span class="stat-value" id="foundCount" style="background: #27ae60;">0</span>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+        </div>
+
+        <div class="instructions">
+            <strong>📝 Yönerge:</strong> Aşağıdaki cümlelerde <strong>fiilimsi olan kelimelere</strong> tıklayın ve hangi türde olduğunu seçin. 
+            Her doğru cevap <strong>+5 puan</strong>, her yanlış cevap <strong>-5 puan</strong>. 
+            <strong>5 yanlış</strong> yaparsanız oyun başa döner!<br>
+            <span style="color: #e74c3c;">⚠️ Fiilimsi olmayan bir kelimeye tıklarsanız -5 puan alırsınız!</span>
+        </div>
+
+        <div id="sentencesContainer"></div>
+    </div>
+
+    <div class="modal" id="answerModal">
+        <div class="modal-content">
+            <h3>Bu kelime hangi fiilimsi türündedir?</h3>
+            <p id="selectedWord" style="font-size: 24px; color: #9b59b6; margin: 15px 0; font-weight: bold; padding: 10px; background: #f8f9fa; border-radius: 8px;"></p>
+            <div class="options">
+                <button class="option-btn isim" onclick="checkAnswer('isim-fiil')">📝 İsim-Fiil</button>
+                <button class="option-btn sifat" onclick="checkAnswer('sıfat-fiil')">🎨 Sıfat-Fiil</button>
+                <button class="option-btn zarf" onclick="checkAnswer('zarf-fiil')">⚡ Zarf-Fiil</button>
+            </div>
+            <button class="close-modal" onclick="closeModal()">İptal</button>
+        </div>
+    </div>
+
+    <div class="modal" id="notFiilimsiModal">
+        <div class="modal-content">
+            <h3 style="color: #e74c3c;">❌ Bu kelime fiilimsi değil!</h3>
+            <p style="font-size: 18px; color: #2c3e50; margin: 20px 0;">"<span id="notFiilimsiWord" style="font-weight: bold; color: #e74c3c; font-size: 22px;"></span>" kelimesi fiilimsi değildir.</p>
+            <p style="font-size: 16px; color: #e67e22;">-5 puan kaybettiniz!</p>
+            <button class="close-modal" onclick="closeNotFiilimsiModal()" style="margin-top: 20px; padding: 12px 30px; background: #3498db; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px;">Tamam, anladım</button>
+        </div>
+    </div>
+
+    <div class="game-over" id="gameOver">
+        <h2>💥 Oyun Bitti!</h2>
+        <p style="font-size: 24px;">5 yanlış hak doldu!</p>
+        <p style="font-size: 20px; margin-top: 10px;">Toplam Puan: <span id="finalScore">0</span></p>
+        <button class="restart-btn" onclick="restartGame()">🔄 Tekrar Oyna</button>
+    </div>
+
+    <script>
+        const sentences = [
+            {
+                id: 1,
+                text: "Ufukta beliren kuyruklu yıldızı gözlemlemek isteyen araştırmacılar, teleskopları kurup gece boyunca sessizce beklediler.",
+                words: ["Ufukta", "beliren", "kuyruklu", "yıldızı", "gözlemlemek", "isteyen", "araştırmacılar,", "teleskopları", "kurup", "gece", "boyunca", "sessizce", "beklediler."],
+                fiilimsiler: {
+                    "beliren": "sıfat-fiil",
+                    "gözlemlemek": "isim-fiil",
+                    "isteyen": "sıfat-fiil",
+                    "kurup": "zarf-fiil"
+                }
+            },
+            {
+                id: 2,
+                text: "Kazı alanında bulunmuş tabletleri inceleyen arkeolog, yazıtların çözüleceğinin haberini ekibine heyecanla verdi.",
+                words: ["Kazı", "alanında", "bulunmuş", "tabletleri", "inceleyen", "arkeolog,", "yazıtların", "çözüleceğinin", "haberini", "ekibine", "heyecanla", "verdi."],
+                fiilimsiler: {
+                    "bulunmuş": "sıfat-fiil",
+                    "inceleyen": "sıfat-fiil",
+                    "çözüleceğinin": "sıfat-fiil"
+                }
+            },
+            {
+                id: 3,
+                text: "Fırtına dinmeden limandan ayrılmak isteyen kaptanı, bitmez dalgalar ve yaklaşan sis endişelendirdi.",
+                words: ["Fırtına", "dinmeden", "limandan", "ayrılmak", "isteyen", "kaptanı,", "bitmez", "dalgalar", "ve", "yaklaşan", "sis", "endişelendirdi."],
+                fiilimsiler: {
+                    "dinmeden": "zarf-fiil",
+                    "ayrılmak": "isim-fiil",
+                    "isteyen": "sıfat-fiil",
+                    "bitmez": "sıfat-fiil",
+                    "yaklaşan": "sıfat-fiil"
+                }
+            },
+            {
+                id: 4,
+                text: "Dağın zirvesinden görülesi vadileri fotoğraflayan gezgin, güneş batınca dönüş yoluna tek başına koyuldu.",
+                words: ["Dağın", "zirvesinden", "görülesi", "vadileri", "fotoğraflayan", "gezgin,", "güneş", "batınca", "dönüş", "yoluna", "tek", "başına", "koyuldu."],
+                fiilimsiler: {
+                    "görülesi": "sıfat-fiil",
+                    "fotoğraflayan": "sıfat-fiil",
+                    "batınca": "zarf-fiil"
+                }
+            },
+            {
+                id: 5,
+                text: "Şehirde kurulacak yeni kütüphanenin çocuklara okuma alışkanlığı kazandırması için uzmanlar titizlikle çalışıyor.",
+                words: ["Şehirde", "kurulacak", "yeni", "kütüphanenin", "çocuklara", "okuma", "alışkanlığı", "kazandırması", "için", "uzmanlar", "titizlikle", "çalışıyor."],
+                fiilimsiler: {
+                    "kurulacak": "sıfat-fiil",
+                    "okuma": "isim-fiil",
+                    "kazandırması": "isim-fiil"
+                }
+            },
+            {
+                id: 6,
+                text: "Orkestranın seslendirdiği dinlenesi eserleri kaydetmeden salondan çıkan eleştirmen, kararını ertesi gün açıkladı.",
+                words: ["Orkestranın", "seslendirdiği", "dinlenesi", "eserleri", "kaydetmeden", "salondan", "çıkan", "eleştirmen,", "kararını", "ertesi", "gün", "açıkladı."],
+                fiilimsiler: {
+                    "seslendirdiği": "sıfat-fiil",
+                    "dinlenesi": "sıfat-fiil",
+                    "kaydetmeden": "zarf-fiil",
+                    "çıkan": "sıfat-fiil"
+                }
+            },
+            {
+                id: 7,
+                text: "Mühendisler, enerji tüketimini azaltacak sistemleri deneye deneye binada ortaya çıkan sorunları çözmeyi başardılar.",
+                words: ["Mühendisler,", "enerji", "tüketimini", "azaltacak", "sistemleri", "deneye", "deneye", "binada", "ortaya", "çıkan", "sorunları", "çözmeyi", "başardılar."],
+                fiilimsiler: {
+                    "azaltacak": "sıfat-fiil",
+                    "deneye deneye": "zarf-fiil",
+                    "çıkan": "sıfat-fiil",
+                    "çözmeyi": "isim-fiil"
+                }
+            },
+            {
+                id: 8,
+                text: "Belgeselde anlatılan sönmez mücadeleyi izleyen gençler, doğayı korumaya söz vererek salondan ayrıldılar.",
+                words: ["Belgeselde", "anlatılan", "sönmez", "mücadeleyi", "izleyen", "gençler,", "doğayı", "korumaya", "söz", "vererek", "salondan", "ayrıldılar."],
+                fiilimsiler: {
+                    "anlatılan": "sıfat-fiil",
+                    "sönmez": "sıfat-fiil",
+                    "izleyen": "sıfat-fiil",
+                    "korumaya": "isim-fiil",
+                    "vererek": "zarf-fiil"
+                }
+            },
+            {
+                id: 9,
+                text: "Yarın açıklanacak sonuçları merak eden adaylar, konuşmaksızın koridorda gidip gelerek saatlerce beklediler.",
+                words: ["Yarın", "açıklanacak", "sonuçları", "merak", "eden", "adaylar,", "konuşmaksızın", "koridorda", "gidip", "gelerek", "saatlerce", "beklediler."],
+                fiilimsiler: {
+                    "açıklanacak": "sıfat-fiil",
+                    "eden": "sıfat-fiil",
+                    "konuşmaksızın": "zarf-fiil",
+                    "gidip": "zarf-fiil",
+                    "gelerek": "zarf-fiil"
+                }
+            },
+            {
+                id: 10,
+                text: "Editör, yayımlanmış dosyalar arasında okunası öyküleri seçerken yazarların özgün anlatımlarını dikkatle karşılaştırdı.",
+                words: ["Editör,", "yayımlanmış", "dosyalar", "arasında", "okunası", "öyküleri", "seçerken", "yazarların", "özgün", "anlatımlarını", "dikkatle", "karşılaştırdı."],
+                fiilimsiler: {
+                    "yayımlanmış": "sıfat-fiil",
+                    "okunası": "sıfat-fiil",
+                    "seçerken": "zarf-fiil"
+                }
+            }
+        ];
+
+        let score = 0;
+        let wrongCount = 0;
+        let foundCount = 0;
+        let totalFiilimsiler = 0;
+        let currentWord = null;
+        let currentSentenceId = null;
+        let foundFiilimsiler = new Set();
+        let isProcessing = false;
+
+        function initGame() {
+            const container = document.getElementById('sentencesContainer');
+            container.innerHTML = '';
+            
+            totalFiilimsiler = 0;
+            
+            sentences.forEach(sentence => {
+                const sentenceDiv = document.createElement('div');
+                sentenceDiv.className = 'sentence-container';
+                sentenceDiv.innerHTML = `
+                    <div class="sentence-number">${sentence.id}. Cümle</div>
+                    <div class="sentence" id="sentence-${sentence.id}"></div>
+                `;
+                
+                const sentenceText = sentenceDiv.querySelector('.sentence');
+                sentence.words.forEach(word => {
+                    const wordSpan = document.createElement('span');
+                    wordSpan.className = 'word';
+                    
+                    if (sentence.fiilimsiler[word]) {
+                        wordSpan.classList.add('clickable');
+                    } else {
+                        wordSpan.classList.add('non-clickable');
+                    }
+                    
+                    wordSpan.textContent = word;
+                    wordSpan.onclick = () => wordClicked(sentence.id, word, wordSpan);
+                    sentenceText.appendChild(wordSpan);
+                });
+                
+                container.appendChild(sentenceDiv);
+                
+                Object.keys(sentence.fiilimsiler).forEach(word => {
+                    totalFiilimsiler++;
+                });
+            });
+            
+            updateStats();
+        }
+
+        function wordClicked(sentenceId, word, element) {
+            if (isProcessing) return;
+            if (element.classList.contains('found')) return;
+            
+            const sentence = sentences.find(s => s.id === sentenceId);
+            const isFiilimsi = sentence.fiilimsiler[word] !== undefined;
+            
+            if (!isFiilimsi) {
+                isProcessing = true;
+                score -= 5;
+                wrongCount++;
+                
+                element.classList.add('not-fiilimsi');
+                setTimeout(() => element.classList.remove('not-fiilimsi'), 600);
+                
+                document.getElementById('notFiilimsiWord').textContent = word;
+                document.getElementById('notFiilimsiModal').style.display = 'flex';
+                
+                showEffect('❌', 'wrong');
+                playSound('wrong');
+                
+                updateStats();
+                
+                if (wrongCount >= 5) {
+                    setTimeout(gameOver, 1000);
+                }
+                
+                setTimeout(() => {
+                    isProcessing = false;
+                }, 600);
+                return;
+            }
+            
+            currentSentenceId = sentenceId;
+            currentWord = word;
+            document.getElementById('selectedWord').textContent = word;
+            document.getElementById('answerModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('answerModal').style.display = 'none';
+            currentWord = null;
+            currentSentenceId = null;
+        }
+
+        function closeNotFiilimsiModal() {
+            document.getElementById('notFiilimsiModal').style.display = 'none';
+            isProcessing = false;
+        }
+
+        function checkAnswer(answerType) {
+            const sentence = sentences.find(s => s.id === currentSentenceId);
+            const correctType = sentence.fiilimsiler[currentWord];
+            
+            if (correctType === answerType) {
+                score += 5;
+                foundCount++;
+                foundFiilimsiler.add(`${currentSentenceId}-${currentWord}`);
+                
+                const words = document.querySelectorAll(`#sentence-${currentSentenceId} .word`);
+                words.forEach(w => {
+                    if (w.textContent === currentWord && !w.classList.contains('found')) {
+                        w.classList.add('found');
+                        w.classList.remove('clickable');
+                        w.classList.add('non-clickable');
+                        w.onclick = null;
+                    }
+                });
+                
+                showEffect('🎉', 'correct');
+                createConfetti();
+                playSound('correct');
+            } else {
+                score -= 5;
+                wrongCount++;
+                
+                const words = document.querySelectorAll(`#sentence-${currentSentenceId} .word`);
+                words.forEach(w => {
+                    if (w.textContent === currentWord) {
+                        w.classList.add('wrong-click');
+                        setTimeout(() => w.classList.remove('wrong-click'), 600);
+                    }
+                });
+                
+                showEffect('😢', 'wrong');
+                playSound('wrong');
+                
+                if (wrongCount >= 5) {
+                    closeModal();
+                    setTimeout(gameOver, 1000);
+                    return;
+                }
+            }
+            
+            closeModal();
+            updateStats();
+            checkWin();
+        }
+
+        function showEffect(emoji, type) {
+            const effect = document.createElement('div');
+            effect.className = 'effect-overlay';
+            effect.textContent = emoji;
+            effect.style.fontSize = type === 'correct' ? '120px' : '100px';
+            document.body.appendChild(effect);
+            
+            setTimeout(() => {
+                effect.remove();
+            }, 1000);
+        }
+
+        function createConfetti() {
+            const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#ffeb3b', '#ff9800'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                confetti.style.width = (Math.random() * 8 + 4) + 'px';
+                confetti.style.height = (Math.random() * 8 + 4) + 'px';
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                confetti.style.position = 'fixed';
+                confetti.style.zIndex = '1001';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+
+        function playSound(type) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                if (type === 'correct') {
+                    oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1);
+                    oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2);
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.5);
+                } else {
+                    oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(150, audioContext.currentTime + 0.4);
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.4);
+                }
+            } catch(e) {
+                // Ses çalışmazsa sessiz geç
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('wrongCount').textContent = `${wrongCount}/5`;
+            document.getElementById('foundCount').textContent = `${foundCount}/${totalFiilimsiler}`;
+            document.getElementById('progressBar').style.width = `${(foundCount / totalFiilimsiler) * 100}%`;
+            
+            const scoreElement = document.getElementById('score');
+            if (score > 0) {
+                scoreElement.style.background = '#27ae60';
+            } else if (score < 0) {
+                scoreElement.style.background = '#e74c3c';
+            } else {
+                scoreElement.style.background = 'rgba(255,255,255,0.2)';
+            }
+        }
+
+        function checkWin() {
+            if (foundCount === totalFiilimsiler) {
+                setTimeout(() => {
+                    showEffect('🏆', 'correct');
+                    createConfetti();
+                    alert(`🎉 Tebrikler! Tüm fiilimsileri buldunuz!\nToplam Puan: ${score}`);
+                }, 500);
+            }
+        }
+
+        function gameOver() {
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOver').style.display = 'flex';
+        }
+
+        function restartGame() {
+            score = 0;
+            wrongCount = 0;
+            foundCount = 0;
+            foundFiilimsiler.clear();
+            isProcessing = false;
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('answerModal').style.display = 'none';
+            document.getElementById('notFiilimsiModal').style.display = 'none';
+            initGame();
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('answerModal');
+            const notModal = document.getElementById('notFiilimsiModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+            if (event.target === notModal) {
+                closeNotFiilimsiModal();
+            }
+        }
+
+        initGame();
+    </script>
+</body>
+</html>
