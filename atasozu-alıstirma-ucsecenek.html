@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Atasözü Bilmece · Klasik Defter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            background: #0e1f12;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+
+        .defter {
+            width: 100%;
+            max-width: 820px;
+            height: 94vh;
+            max-height: 780px;
+            background: linear-gradient(160deg, #faf3dd 0%, #efe3c0 60%, #e2d2a8 100%);
+            border-radius: 2px 16px 16px 2px;
+            box-shadow: -6px 0 0 #b18b2a, 0 0 0 3px #d6b44a, 6px 12px 48px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .defter::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: repeating-linear-gradient(transparent, transparent 34px, rgba(130, 100, 30, 0.09) 34px, rgba(130, 100, 30, 0.09) 35px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .defter::after {
+            content: '';
+            position: absolute;
+            left: 44px;
+            top: 0; bottom: 0;
+            width: 1.6px;
+            background: rgba(190, 70, 50, 0.25);
+            z-index: 1;
+        }
+
+        .baslik {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px 6px 20px;
+            border-bottom: 1.5px solid rgba(150, 120, 30, 0.25);
+            background: rgba(255, 248, 215, 0.5);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .sol {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .etiket {
+            background: rgba(80, 60, 10, 0.08);
+            border: 1px solid rgba(160, 130, 30, 0.35);
+            border-radius: 30px;
+            padding: 2px 14px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #3e2e08;
+            letter-spacing: 0.3px;
+        }
+
+        .puan-etiketi {
+            background: #1d492a;
+            color: #caf0b0;
+            border-color: #2f6a3e;
+        }
+
+        .sag {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ses-btn {
+            background: #25683e;
+            border: none;
+            color: #e4fad0;
+            font-size: 0.78rem;
+            padding: 5px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: inherit;
+            transition: 0.12s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .ses-btn:hover { background: #32804e; }
+        .ses-btn:active { transform: scale(0.95); }
+
+        .sifirla-btn {
+            background: transparent;
+            border: 1px solid rgba(160, 120, 20, 0.4);
+            color: #5a4008;
+            border-radius: 30px;
+            padding: 4px 14px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .sifirla-btn:hover { background: rgba(160, 120, 20, 0.12); }
+
+        .govde {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 8px 14px 8px 52px;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .deyim-alani {
+            flex: 0 0 48%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 10px 6px 8px 0;
+            border-bottom: 1.5px solid rgba(150, 120, 30, 0.2);
+            min-height: 0;
+        }
+
+        .deyim-baslik {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #7a5a14;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            opacity: 0.75;
+        }
+
+        .anlam-metin {
+            font-family: 'Segoe UI', 'Georgia', serif;
+            font-size: clamp(1.2rem, 2.8vh, 2rem);
+            font-weight: 600;
+            color: #191e0e;
+            line-height: 1.5;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .ornek-metin {
+            font-size: clamp(0.85rem, 1.6vh, 1.15rem);
+            font-weight: 400;
+            color: #3d3a28;
+            margin-top: 6px;
+            font-style: italic;
+            opacity: 0.8;
+            border-left: 3px solid rgba(160, 130, 40, 0.3);
+            padding-left: 12px;
+        }
+
+        .soru-alani {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 12px 0 6px;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .soru-etiket {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #5a4008;
+            margin-bottom: 8px;
+            opacity: 0.85;
+        }
+
+        .secenekler {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .sec-btn {
+            background: rgba(30, 60, 22, 0.88);
+            border: 1.6px solid rgba(80, 160, 60, 0.45);
+            border-radius: 50px;
+            padding: 0 18px;
+            min-height: 42px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #d2f0b8;
+            cursor: pointer;
+            text-align: center;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            transition: 0.1s;
+            flex-shrink: 0;
+        }
+        .sec-btn:hover:not([disabled]) {
+            background: rgba(40, 90, 26, 0.95);
+            border-color: rgba(120, 220, 80, 0.7);
+            color: #ecffe0;
+        }
+        .sec-btn.dogru {
+            background: #15457a !important;
+            border-color: #4fa0e8 !important;
+            color: #d8ecff !important;
+        }
+        .sec-btn.yanlis {
+            background: #6b1f14 !important;
+            border-color: #d06050 !important;
+            color: #ffd8d0 !important;
+            text-decoration: line-through;
+        }
+        .sec-btn[disabled] { cursor: default; }
+
+        .alt-cubuk {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 16px 8px 52px;
+            border-top: 1.5px solid rgba(150, 120, 30, 0.2);
+            background: rgba(255, 248, 215, 0.35);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .geri-bildirim {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #4a3a0e;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sonraki-btn {
+            background: linear-gradient(135deg, #9a6912, #c48c0e);
+            border: none;
+            padding: 7px 22px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #fffce0;
+            cursor: pointer;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+            box-shadow: 0 3px 0 #684a0a, 0 4px 14px rgba(0,0,0,0.2);
+            transition: 0.1s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .sonraki-btn:hover { background: linear-gradient(135deg, #b07814, #d8a010); }
+        .sonraki-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #684a0a; }
+        .sonraki-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        @media (max-height: 640px) {
+            .anlam-metin { font-size: clamp(1rem, 2.2vh, 1.4rem); }
+            .ornek-metin { font-size: clamp(0.7rem, 1.2vh, 0.9rem); }
+            .sec-btn { min-height: 34px; font-size: 0.78rem; padding: 0 12px; }
+            .deyim-alani { flex: 0 0 42%; }
+        }
+
+        @media (max-height: 500px) {
+            .anlam-metin { font-size: 0.9rem; }
+            .sec-btn { min-height: 30px; font-size: 0.7rem; }
+            .govde { padding-left: 44px; }
+            .defter::after { left: 36px; }
+        }
+
+        @media (min-width: 700px) {
+            .govde { padding-left: 64px; }
+            .defter::after { left: 52px; }
+        }
+
+        @keyframes confFall {
+            0% { opacity: 0; transform: translate(0, 0) rotate(0); }
+            10% { opacity: 1; }
+            100% { opacity: 0; transform: translate(var(--drift), 105vh) rotate(720deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="defter">
+
+    <div class="baslik">
+        <div class="sol">
+            <span class="etiket">📖 <span id="soruNo">1</span>/<span id="toplamSoru">10</span></span>
+            <span class="etiket puan-etiketi">⭐ <span id="puan">0</span> puan</span>
+        </div>
+        <div class="sag">
+            <button class="ses-btn" id="sesBtn"> Oku</button>
+            <button class="sifirla-btn" id="sifirlaBtn">🔄 Yeni Set</button>
+        </div>
+    </div>
+
+    <div class="govde">
+
+        <div class="deyim-alani">
+            <div class="deyim-baslik">📝 Dolaylı Açıklama</div>
+            <div class="anlam-metin" id="anlamMetin"></div>
+        </div>
+
+        <div class="soru-alani">
+            <div class="soru-etiket">🌙 Bu açıklamaya uygun atasözü hangisidir?</div>
+            <div class="secenekler" id="secenekKutu"></div>
+        </div>
+
+    </div>
+
+    <div class="alt-cubuk">
+        <div class="geri-bildirim" id="geriBildirim">💡 Bir seçenek seçin</div>
+        <button class="sonraki-btn" id="sonrakiBtn"> Sonraki</button>
+    </div>
+
+</div>
+
+<script>
+    // ─── TÜM ATASÖZLERİ (200 ADET) ───────────────────
+    const ATASOZLERI = [
+        { atasozu: "Acele işe şeytan karışır", aciklama: "Düşünmeden hareket etmek beklenmedik aksaklıklara yol açabilir." },
+        { atasozu: "Ağaç yaşken eğilir", aciklama: "Kişilik ve davranış alışkanlıklarının temeli çocukluk döneminde daha kolay şekillenir." },
+        { atasozu: "Ak akçe kara gün içindir", aciklama: "Kazancın bir bölümünü ileride doğabilecek sıkıntılar için ayırmak gerekir." },
+        { atasozu: "Akıl akıldan üstündür", aciklama: "Tek kişinin görüşü her konuda yeterli olmayabilir; farklı bakışlar çözümü geliştirebilir." },
+        { atasozu: "Alma mazlumun ahını, çıkar aheste aheste", aciklama: "Güçsüz birine haksızlık eden kimse, bunun sonucuyla er ya da geç karşılaşır." },
+        { atasozu: "Armut dibine düşer", aciklama: "Evlatlarda aileden gelen özelliklerin görülmesi doğaldır." },
+        { atasozu: "Ayağını yorganına göre uzat", aciklama: "Giderleri, sahip olunan maddi imkânları aşmayacak biçimde düzenlemek gerekir." },
+        { atasozu: "Azıcık aşım, kaygısız başım", aciklama: "Sınırlı olanaklarla yaşamayı kabullenmek, kişiyi maddi baskılardan koruyabilir." },
+        { atasozu: "Bakarsan bağ olur, bakmazsan dağ olur", aciklama: "Üzerine emek verilen alan gelişirken ihmal edilen yer bozulur." },
+        { atasozu: "Bal tutan parmağını yalar", aciklama: "Bir imkâna doğrudan erişimi bulunan kişi, ondan kendisi için de pay çıkarabilir." },
+        { atasozu: "Besle kargayı, oysun gözünü", aciklama: "Değer verilen biri, beklenmedik biçimde zarar verebilir." },
+        { atasozu: "Bir elin nesi var, iki elin sesi var", aciklama: "Ortak çaba, tek başına yapılabileceklerden daha etkili sonuçlar doğurur." },
+        { atasozu: "Bir musibet bin nasihatten iyidir", aciklama: "Başa gelen olumsuz bir olay, teorik uyarılardan daha kalıcı ders bırakabilir." },
+        { atasozu: "Bugünün işini yarına bırakma", aciklama: "Sorumlulukları zamanında yerine getirmek, birikerek sorun oluşturmalarını önler." },
+        { atasozu: "Büyük lokma ye, büyük söz söyleme", aciklama: "İnsan, kapasitesini aşan hedefler konusunda ölçülü davranmalıdır." },
+        { atasozu: "Can boğazdan gelir", aciklama: "Bedensel güç ve iyilik hâli yeterli beslenmeyle desteklenir." },
+        { atasozu: "Çivi çiviyi söker", aciklama: "Bazı güçlükler, benzer nitelikte başka bir araç ya da yöntemle aşılabilir." },
+        { atasozu: "Damlaya damlaya göl olur", aciklama: "Küçük miktarlar düzenli biçimde bir araya geldiğinde önemli bir birikim oluşturabilir." },
+        { atasozu: "Davulun sesi uzaktan hoş gelir", aciklama: "Bir uğraşın zahmeti, onu yaşamayan kişiye olduğundan daha hafif görünebilir." },
+        { atasozu: "Denize düşen yılana sarılır", aciklama: "Çaresiz kalan kişi, normalde tercih etmeyeceği yollara başvurabilir." },
+        { atasozu: "Dereyi görmeden paçayı sıvama", aciklama: "Henüz gerçekleşmemiş bir durum için kesin davranmak doğru değildir." },
+        { atasozu: "Dost acı söyler", aciklama: "Samimi bağlılık, hoşumuza gitmese bile gerçeğin açıkça dile getirilmesini gerektirebilir." },
+        { atasozu: "Dost kara günde belli olur", aciklama: "Bir ilişkinin sağlamlığı, sıkıntılı dönemlerde gösterilen destekle sınanır." },
+        { atasozu: "El elden üstündür", aciklama: "Kişi ne kadar yetenekli olursa olsun, kendisinden daha yetkin biri bulunabilir." },
+        { atasozu: "El el ile, değirmen yel ile", aciklama: "İnsanların ihtiyaçlarını karşılaması çoğu zaman karşılıklı desteğe bağlıdır." },
+        { atasozu: "Ev alma, komşu al", aciklama: "Bir yerde huzurlu yaşamak, çevredeki insan ilişkilerine büyük ölçüde bağlıdır." },
+        { atasozu: "Fazla mal göz çıkarmaz", aciklama: "İşe yarayan kaynakların yedekte bulunması çoğu zaman avantaj sağlar." },
+        { atasozu: "Gülü seven dikenine katlanır", aciklama: "Değer verilen bir şeyin beraberinde getirdiği sıkıntılar da kabullenilmelidir." },
+        { atasozu: "Güneş balçıkla sıvanmaz", aciklama: "Herkesçe bilinen bir gerçeği örtbas etmeye çalışmak sonuç vermez." },
+        { atasozu: "Hamama giren terler", aciklama: "Bir sorumluluğu üstlenen kişi, onun getireceği güçlükleri de kabul etmiş sayılır." },
+        { atasozu: "Her yiğidin bir yoğurt yiyişi vardır", aciklama: "Aynı sonuca ulaşmak için kişiden kişiye değişen yöntemler kullanılabilir." },
+        { atasozu: "İğneyi kendine, çuvaldızı başkasına batır", aciklama: "Eleştiri yöneltmeden önce insan kendi kusurlarını değerlendirmelidir." },
+        { atasozu: "İşleyen demir ışıldar", aciklama: "Sürekli üretken kalan kişi becerilerini canlı tutar." },
+        { atasozu: "Kaçan balık büyük olur", aciklama: "Geride bırakılan fırsatlar sonradan olduğundan daha cazip hatırlanabilir." },
+        { atasozu: "Keskin sirke küpüne zarar", aciklama: "Kontrolsüz öfke, en çok onu taşıyan kişiyi yıpratır." },
+        { atasozu: "Komşu komşunun külüne muhtaçtır", aciklama: "En küçük ihtiyaçlarda bile çevredeki insanların desteği gerekebilir." },
+        { atasozu: "Körle yatan şaşı kalkar", aciklama: "Sürekli birlikte olunan kişilerin olumsuz alışkanlıkları zamanla benimsenebilir." },
+        { atasozu: "Lafla peynir gemisi yürümez", aciklama: "Bir hedefe ulaşmak için niyet belirtmek yetmez; somut çaba gerekir." },
+        { atasozu: "Mart kapıdan baktırır, kazma kürek yaktırır", aciklama: "İlkbaharın başlangıcında havalar beklenmedik biçimde sertleşebilir." },
+        { atasozu: "Minareyi çalan kılıfını hazırlar", aciklama: "Büyük bir usulsüzlüğe kalkışan kişi, kendini savunacak gerekçeyi de önceden düşünür." },
+        { atasozu: "Ne ekersen onu biçersin", aciklama: "Kişinin tutumları, ileride karşılaşacağı sonuçları şekillendirir." },
+        { atasozu: "Ne oldum dememeli, ne olacağım demeli", aciklama: "İçinde bulunulan başarıya kapılmadan gelecekte koşulların değişebileceği unutulmamalıdır." },
+        { atasozu: "Öfkeyle kalkan zararla oturur", aciklama: "Duyguların etkisiyle düşünmeden verilen kararlar kişinin aleyhine sonuçlanabilir." },
+        { atasozu: "Perşembenin gelişi çarşambadan bellidir", aciklama: "Bir sürecin nasıl biteceğine dair işaretler başlangıç aşamalarında görülebilir." },
+        { atasozu: "Sakla samanı, gelir zamanı", aciklama: "Bugün değersiz görülen bir nesne, ileride ihtiyaç hâline gelebilir." },
+        { atasozu: "Son pişmanlık fayda etmez", aciklama: "Geri dönüş imkânı kalmadıktan sonra duyulan üzüntü sonucu değiştirmez." },
+        { atasozu: "Sora sora Bağdat bulunur", aciklama: "Bilgiye ya da hedefe ulaşmada çevreden yönlendirme istemek yararlı olabilir." },
+        { atasozu: "Su uyur, düşman uyumaz", aciklama: "Tehlike ihtimali ortadan kalkmış görünse bile tedbiri elden bırakmamak gerekir." },
+        { atasozu: "Taşıma suyla değirmen dönmez", aciklama: "Süreklilik isteyen bir düzen, dışarıdan sağlanan geçici desteklerle ayakta tutulamaz." },
+        { atasozu: "Tatlı dil yılanı deliğinden çıkarır", aciklama: "Nazik ve ölçülü iletişim, direnç gösteren kişileri bile ikna etmeyi kolaylaştırabilir." },
+        { atasozu: "Terzi kendi söküğünü dikemez", aciklama: "Kişi uzmanı olduğu konuda bile kendi ihtiyaçlarını ihmal edebilir." },
+        { atasozu: "Üzüm üzüme baka baka kararır", aciklama: "Uzun süre aynı çevrede bulunan insanlar birbirlerinin özelliklerini benimseyebilir." },
+        { atasozu: "Yalancının mumu yatsıya kadar yanar", aciklama: "Gerçeğe aykırı anlatımlar uzun süre gizli kalamaz." },
+        { atasozu: "Yalnız taş duvar olmaz", aciklama: "Kapsamlı işler çoğu zaman ortak emek gerektirir." },
+        { atasozu: "Yatan aslandan gezen tilki yeğdir", aciklama: "Ortalama yeteneğe sahip ama girişken biri, becerikli olup hareketsiz kalandan daha fazla sonuç alabilir." },
+        { atasozu: "Zararın neresinden dönülse kârdır", aciklama: "Yanlış bir tutumu sürdürmek yerine, ne kadar gecikilmiş olursa olsun vazgeçmek daha iyidir." },
+        { atasozu: "Zorla güzellik olmaz", aciklama: "İstek bulunmayan yerde baskıyla olumlu sonuç elde edilemez." },
+        { atasozu: "Aç ayı oynamaz", aciklama: "Temel gereksinimleri karşılanmayan kişiden yüksek performans beklemek gerçekçi değildir." },
+        { atasozu: "Aç tavuk kendini buğday ambarında sanır", aciklama: "Yoğun arzu, kişinin gerçekçi olmayan beklentilere kapılmasına yol açabilir." },
+        { atasozu: "Ağlamayan çocuğa meme vermezler", aciklama: "Talebini dile getirmeyen kişinin gereksinimi çevresi tarafından fark edilmeyebilir." },
+        { atasozu: "Akıllı düşman akılsız dosttan hayırlıdır", aciklama: "Bilinçsiz yakınlık, açıkça karşıt olan birinden daha büyük sorun yaratabilir." },
+        { atasozu: "Ateş olmayan yerden duman çıkmaz", aciklama: "Yaygınlaşan söylentilerin çoğu zaman bir dayanağı bulunur." },
+        { atasozu: "At sahibine göre kişner", aciklama: "Bir kişinin davranış biçimi, onu yönlendiren kimsenin tutumundan etkilenebilir." },
+        { atasozu: "Az veren candan, çok veren maldan", aciklama: "Yardımın değeri miktarından çok, vereni ne ölçüde zorladığıyla ilişkilidir." },
+        { atasozu: "Bağa bak üzüm olsun, yemeye yüzün olsun", aciklama: "Bir şeyden yararlanabilmek için önce onun gelişmesine katkı sunmak gerekir." },
+        { atasozu: "Balık baştan kokar", aciklama: "Bir kurumda görülen bozulmanın kaynağı çoğu zaman yönetim kademesidir." },
+        { atasozu: "Baş başa vermeyince taş yerinden kalkmaz", aciklama: "Güç gerektiren görevler, insanların çabalarını birleştirmesiyle başarılabilir." },
+        { atasozu: "Bir fincan kahvenin kırk yıl hatırı vardır", aciklama: "Küçük bir ikram ya da jest, kişiler arasında uzun süreli gönül bağı oluşturabilir." },
+        { atasozu: "Bir koltuğa iki karpuz sığmaz", aciklama: "Birden fazla ağır sorumluluğu eş zamanlı yürütmek verimi düşürebilir." },
+        { atasozu: "Birlikten kuvvet doğar", aciklama: "Ortak hareket eden topluluklar daha etkili sonuçlar elde eder." },
+        { atasozu: "Borç yiğidin kamçısıdır", aciklama: "Maddi yükümlülükler, kişiyi daha fazla çaba göstermeye teşvik edebilir." },
+        { atasozu: "Boş çuval ayakta durmaz", aciklama: "Bedensel gereksinimleri giderilmeyen kimse görevlerini sağlıklı biçimde sürdüremez." },
+        { atasozu: "Bugünkü tavuk yarınki kazdan iyidir", aciklama: "Elde bulunan mütevazı imkân, gerçekleşmesi belirsiz büyük beklentiden daha güvenlidir." },
+        { atasozu: "Çobansız koyunu kurt kapar", aciklama: "Yönetim ve gözetimden yoksun topluluklar dış tehditlere açık hâle gelebilir." },
+        { atasozu: "Dağ dağa kavuşmaz, insan insana kavuşur", aciklama: "İnsan ilişkilerinde uzaklık, gelecekte yeniden temas kurulmasına engel değildir." },
+        { atasozu: "Deli dostun olacağına akıllı düşmanın olsun", aciklama: "Bilinçsiz bir yakın, açıkça karşıt olan birinden daha tehlikeli sonuçlar doğurabilir." },
+        { atasozu: "Demir tavında dövülür", aciklama: "Başarı için yalnızca doğru yöntem değil, uygun fırsatı değerlendirmek de önemlidir." },
+        { atasozu: "Dikensiz gül olmaz", aciklama: "Değerli ve güzel görülen şeylerin beraberinde bazı güçlükler bulunabilir." },
+        { atasozu: "Doğru söyleyeni dokuz köyden kovarlar", aciklama: "Rahatsız edici gerçekleri dile getiren kişiler çevreden tepki görebilir." },
+        { atasozu: "El elin eşeğini türkü çağırarak arar", aciklama: "Başkasının sıkıntısı, onu yaşamayan kişi için aynı önemi taşımayabilir." },
+        { atasozu: "Erken kalkan yol alır", aciklama: "Planlı davranan kişi fırsatları değerlendirmede üstünlük sağlayabilir." },
+        { atasozu: "Et tırnaktan ayrılmaz", aciklama: "Güçlü aile bağları, yaşanan anlaşmazlıklara rağmen kolayca kopmayabilir." },
+        { atasozu: "Geç olsun, güç olmasın", aciklama: "Beklenen sonucun zaman alması, sürecin ağır sorunlarla ilerlemesinden daha kabul edilebilir olabilir." },
+        { atasozu: "Görünen köy kılavuz istemez", aciklama: "Açık kanıtların bulunduğu konuda ek açıklamaya ihtiyaç duyulmaz." },
+        { atasozu: "Her çok azdan olur", aciklama: "Büyük birikimler, küçük katkıların düzenli biçimde birleşmesiyle oluşur." },
+        { atasozu: "Horozu çok olan köyün sabahı geç olur", aciklama: "Bir işte yetki sahibi kişi sayısı gereğinden fazla olduğunda süreç yavaşlayabilir." },
+        { atasozu: "İki cambaz bir ipte oynamaz", aciklama: "Aynı ölçüde kurnaz kişiler uzun süre uyum içinde çalışmakta zorlanabilir." },
+        { atasozu: "İki dinle, bir söyle", aciklama: "Sağlıklı iletişimde karşıdakini anlamaya, kendini ifade etmekten daha çok yer vermek gerekir." },
+        { atasozu: "İyilik eden iyilik bulur", aciklama: "Olumlu davranışlar zamanla kişiye benzer karşılıklar getirebilir." },
+        { atasozu: "Kervan yolda düzülür", aciklama: "Bir girişimin bütün ayrıntıları baştan hazır olmayabilir; süreç içinde biçimlenebilir." },
+        { atasozu: "Korkunun ecele faydası yoktur", aciklama: "Kaçınılmaz bir durum nedeniyle huzursuz olmak sonucu değiştirmez." },
+        { atasozu: "Meyve veren ağaç taşlanır", aciklama: "Öne çıkan ve üretken kişiler çevrelerinden daha fazla eleştiri alabilir." },
+        { atasozu: "Misafir umduğunu değil, bulduğunu yer", aciklama: "Bir başkasının evine gelen kişi, kendisine sunulan imkânlarla yetinmelidir." },
+        { atasozu: "Mum dibine ışık vermez", aciklama: "Kişi bazen sahip olduğu yetenekten en yakın çevresini yeterince yararlandıramaz." },
+        { atasozu: "Ön tekerlek nereye giderse arka tekerlek de oraya gider", aciklama: "Çocukların tutumları çoğu zaman yetişkinlerin davranış örneklerinden etkilenir." },
+        { atasozu: "Rüzgâr eken fırtına biçer", aciklama: "Kötü niyetli davranışlar zamanla daha ağır sonuçlarla geri dönebilir." },
+        { atasozu: "Sabreden derviş muradına ermiş", aciklama: "Kararlılığın sürdürülmesi, olumlu sonuca ulaşma ihtimalini artırır." },
+        { atasozu: "Söz gümüşse sükût altındır", aciklama: "Bazı durumlarda düşünceleri paylaşmamak daha yerinde bir tutum olabilir." },
+        { atasozu: "Sütten ağzı yanan yoğurdu üfleyerek yer", aciklama: "Daha önce olumsuzluk yaşamış kişi, benzer durumlarda gereğinden fazla tedbirli davranabilir." },
+        { atasozu: "Tekkeyi bekleyen çorbayı içer", aciklama: "Bir yerde kararlılıkla emek veren kişi zamanla emeğinin karşılığını görebilir." },
+        { atasozu: "Abanın kadri yağmurda bilinir", aciklama: "Bazı şeyler, yalnızca gereksinim doğduğunda vazgeçilmez hâle gelir." },
+        { atasozu: "Abdal ata binince bey oldum sanır, şalgam aşa girince yağ oldum sanır", aciklama: "Sınırlı bir imkân bazı kişilerin kendilerine gereğinden fazla paye biçmesine yol açabilir." },
+        { atasozu: "Acı patlıcanı kırağı çalmaz", aciklama: "Sıkıntılı koşullara alışmış kimseler yeni güçlüklerden fazla etkilenmeyebilir." },
+        { atasozu: "Aç doymam, tok acıkmam sanır", aciklama: "Kişiler kendi koşullarını ölçü alarak başkalarının ihtiyaçlarını yanlış değerlendirebilir." },
+        { atasozu: "Aç ne yemez, tok ne demez", aciklama: "Temel gereksinimleri karşılanmayan kimse seçenekler arasında ayrım yapamaz." },
+        { atasozu: "Adamın iyisi iş başında belli olur", aciklama: "Kişinin niteliği, sorumluluk üstlendiği sıradaki tutumları üzerinden değerlendirilir." },
+        { atasozu: "Ağaca çıkan keçinin dala bakan oğlağı olur", aciklama: "Küçükler, çevrelerindeki yetişkinlerin davranış kalıplarını benimser." },
+        { atasozu: "Ağacın kurdu içinde olur", aciklama: "Bir topluluğu zayıflatan etken bazen dışarıdan değil, kendi bünyesinden kaynaklanır." },
+        { atasozu: "Ağanın gözü öküzü semirtir", aciklama: "Sorumlu kişinin yakından ilgilendiği görevler daha düzenli yürür." },
+        { atasozu: "Ağır kazan geç kaynar", aciklama: "Olgun ve temkinli kişiler tepkilerini hemen ortaya koymaz." },
+        { atasozu: "Ağır taş yerinden oynamaz", aciklama: "Sağlam karakterli kimseler dış etkilerle kolayca tutum değiştirmez." },
+        { atasozu: "Ağustosta beyni kaynayanın zemheride kazanı kaynar", aciklama: "Çalışma dönemini iyi değerlendiren kişi, ihtiyaçların arttığı zamanlarda sıkıntı çekmez." },
+        { atasozu: "Ak koyunun kara kuzusu da olur", aciklama: "İyi özellikleriyle tanınan bir çevreden beklenmedik biçimde olumsuz nitelikli biri çıkabilir." },
+        { atasozu: "Akan su yosun tutmaz", aciklama: "Sürekli üretken ve hareketli kalan kişi körelmez." },
+        { atasozu: "Akıllı köprü arayıncaya dek deli suyu geçer", aciklama: "Aşırı düşünmek bazen fırsatın elden kaçmasına neden olabilir." },
+        { atasozu: "Akıl yaşta değil baştadır", aciklama: "Yerinde karar verebilme becerisi, kişinin ömründeki süreyle ölçülemez." },
+        { atasozu: "Allah dağına göre kar verir", aciklama: "İnsan genellikle karşılaştığı güçlüklerle baş edebilecek kapasiteyi de taşır." },
+        { atasozu: "Anlayana sivrisinek saz, anlamayana davul zurna az", aciklama: "Kavrayışlı bir kişiye küçük bir ipucu yeterken, dikkatsiz biri çok açık işaretleri bile kaçırabilir." },
+        { atasozu: "Araba devrilince yol gösteren çok olur", aciklama: "Olumsuz sonuç ortaya çıktıktan sonra tavsiye vermek kolaydır." },
+        { atasozu: "Arı bal alacak çiçeği bilir", aciklama: "Deneyimli kişi, hangi kaynağın kendisine yarar sağlayacağını seçebilir." },
+        { atasozu: "Arpa eken buğday biçmez", aciklama: "Kişinin yaptığı tercihler, elde edeceği sonucu doğrudan etkiler." },
+        { atasozu: "Aslan yattığı yerden belli olur", aciklama: "Düzen ve yaşam biçimi, kişinin özellikleri hakkında ipucu verebilir." },
+        { atasozu: "Ateş düştüğü yeri yakar", aciklama: "Bir olayın yarattığı acıyı en yoğun biçimde doğrudan yaşayan hisseder." },
+        { atasozu: "Atılan ok geri dönmez", aciklama: "Gerçekleştirilen bazı eylemler sonradan telafi edilemeyecek sonuçlar doğurabilir." },
+        { atasozu: "At ölür meydan kalır, yiğit ölür şan kalır", aciklama: "İnsanın yaşamı sona erse de yaptığı değerli işler hatırlanmasını sağlayabilir." },
+        { atasozu: "Atın ölümü arpadan olsun", aciklama: "Kişi çok sevdiği bir şey uğruna doğabilecek olumsuzlukları önemsemeyebilir." },
+        { atasozu: "Bal bal demekle ağız tatlanmaz", aciklama: "Salt niyet belirtmek, beklenen sonucun gerçekleşmesi için yeterli değildir." },
+        { atasozu: "Bana dokunmayan yılan bin yaşasın", aciklama: "Bazı insanlar, kendilerini etkilemeyen haksızlıklara karşı duyarsız kalabilir." },
+        { atasozu: "Beş parmağın beşi bir değildir", aciklama: "Aynı ortamda bulunan kişilerin özellikleri birbirinden farklı olabilir." },
+        { atasozu: "Bin bilsen de bir bilene danış", aciklama: "Ne kadar deneyimli olunursa olunsun, gerektiğinde uzman görüşüne başvurmak yararlıdır." },
+        { atasozu: "Bin dost az, bir düşman çok", aciklama: "Çok sayıda yakınlık sorun yaratmazken tek bir karşıt kişi bile ciddi sıkıntı doğurabilir." },
+        { atasozu: "Boş fıçı çok langırdar", aciklama: "Bilgisi sınırlı kişiler kimi zaman gereğinden fazla konuşabilir." },
+        { atasozu: "Bugünün yarını da var", aciklama: "Şimdiki davranışların ilerleyen dönemlerde sonuçları olabileceği unutulmamalıdır." },
+        { atasozu: "Bülbülü altın kafese koymuşlar, ah vatanım demiş", aciklama: "İnsan, rahat koşullara sahip olsa bile doğup büyüdüğü yere özlem duyabilir." },
+        { atasozu: "Çam sakızı çoban armağanı", aciklama: "Sunulan şeyin maddi büyüklüğünden çok, arkasındaki samimiyet önem taşır." },
+        { atasozu: "Çıkmadık candan umut kesilmez", aciklama: "Koşullar tamamen sona ermediği sürece olumlu bir ihtimal vardır." },
+        { atasozu: "Çok bilen çok yanılır", aciklama: "Bilgi düzeyi yüksek olmak, yanlış yapma olasılığını ortadan kaldırmaz." },
+        { atasozu: "Çok gezen çok bilir", aciklama: "Farklı yerler ve durumlar görmek kişinin dünyaya ilişkin birikimini artırır." },
+        { atasozu: "Çok naz âşık usandırır", aciklama: "Karşı tarafı sürekli bekletmek ve isteksiz davranmak ilişkide bıkkınlık yaratabilir." },
+        { atasozu: "Çok söz yalansız, çok para haramsız olmaz", aciklama: "Ölçüsüzlük, bazı alanlarda kusur ve yanlış ihtimalini artırır." },
+        { atasozu: "Dağ ne kadar yüce olsa yol üstünden aşar", aciklama: "En zor engeller için bile çözüm üretilebilir." },
+        { atasozu: "Deveyi yardan uçuran bir tutam ottur", aciklama: "Küçük bir çıkar, insanı ölçüsüz riskler almaya yöneltebilir." },
+        { atasozu: "Doğmadık çocuğa don biçilmez", aciklama: "Henüz gerçekleşmesi kesinleşmemiş bir durum için ayrıntılı plan yapmak doğru değildir." },
+        { atasozu: "Dost başa, düşman ayağa bakar", aciklama: "Yakınlık içindeki kişi genel durumu önemser; karşıt olan ise kusur arar." },
+        { atasozu: "Dost ile ye iç, alışveriş etme", aciklama: "Maddi çıkar ilişkileri, sağlam yakınlıkları bile bozabilir." },
+        { atasozu: "Duvarı nem, insanı gam yıkar", aciklama: "Uzun süre taşınan ruhsal yükler, kişiyi zamanla güçsüz bırakabilir." },
+        { atasozu: "Eğri otur, doğru söyle", aciklama: "Kişi, rahatına uymasa bile gerçeğe bağlı kalmalıdır." },
+        { atasozu: "Ek tohumun hasını, çekme yiyecek yasını", aciklama: "Başlangıçta nitelikli malzeme ve özen kullanmak, ileride daha iyi verim sağlar." },
+        { atasozu: "Elin ağzı torba değil ki büzesin", aciklama: "Başkalarının ne konuşacağını tamamen kontrol etmek mümkün değildir." },
+        { atasozu: "Elin tavuğu ele kaz görünür", aciklama: "Başkalarının sahip oldukları, kişiye çoğu zaman kendi imkânlarından daha cazip görünebilir." },
+        { atasozu: "Emek olmadan yemek olmaz", aciklama: "Karşılık elde edebilmek için üretkenlik gerekir." },
+        { atasozu: "Eski dost düşman olmaz", aciklama: "Köklü ilişkiler, geçici anlaşmazlıklarla kolayca bütünüyle bozulmaz." },
+        { atasozu: "Eşeğe altın semer vursalar yine eşektir", aciklama: "Dış görünüşte yapılan değişiklikler, kişinin temel niteliğini değiştirmeyebilir." },
+        { atasozu: "Eşeğini sağlam kazığa bağla, sonra Allah'a ısmarla", aciklama: "Sonucu kadere bırakmadan önce gerekli tedbirleri almak gerekir." },
+        { atasozu: "Evdeki hesap çarşıya uymaz", aciklama: "Kâğıt üzerinde uygun görünen planlar gerçek koşullarda aynı şekilde işlemeyebilir." },
+        { atasozu: "Garip kuşun yuvasını Allah yapar", aciklama: "Yalnız kalan veya desteği az olan kişiye beklenmedik bir yerden yardım gelebilir." },
+        { atasozu: "Gelin ata binmiş, ya nasip demiş", aciklama: "Bir girişime başlanmış olması, sonucunun kesin olduğu anlamına gelmez." },
+        { atasozu: "Gençliğin kıymeti ihtiyarlıkta bilinir", aciklama: "Sahip olunan olanakların ayrıcalığı çoğu zaman artık geri getirilemediğinde hissedilir." },
+        { atasozu: "Gönül ferman dinlemez", aciklama: "Duygular, kurallarla ya da emirlerle bütünüyle kontrol edilemez." },
+        { atasozu: "Gözden ırak olan gönülden de ırak olur", aciklama: "Uzun süre iletişim kurmayan kişiler arasındaki yakınlık zamanla zayıflayabilir." },
+        { atasozu: "Hak deyince akan sular durur", aciklama: "Adaletli ve sağlam bir gerekçe karşısında itiraz etmek güçleşir." },
+        { atasozu: "Harman yel ile, düğün el ile", aciklama: "Bazı büyük organizasyonlar çevrenin katkısı olmadan sağlıklı biçimde yürütülemez." },
+        { atasozu: "Her horoz kendi çöplüğünde öter", aciklama: "Kişi kendi çevresinde daha rahat ve etkili davranabilir." },
+        { atasozu: "Her işte bir hayır vardır", aciklama: "İlk bakışta kötü görünen gelişmeler bazen olumlu sonuçlara dönüşebilir." },
+        { atasozu: "Her koyun kendi bacağından asılır", aciklama: "Her birey kendi seçimlerinin doğurduğu sonuçlardan sorumludur." },
+        { atasozu: "Her şeyin yenisi, dostun eskisi", aciklama: "Eşyalarda yenilik tercih edilirken ilişkilerde uzun geçmiş değer taşır." },
+        { atasozu: "Isıracak köpek dişini göstermez", aciklama: "Gerçekten kötü niyet taşıyan kişi bunu önceden açıkça göstermeyebilir." },
+        { atasozu: "İki ölç, bir biç", aciklama: "Uygulamaya geçmeden önce ayrıntılı değerlendirme yapmak hataları azaltır." },
+        { atasozu: "İyilik et denize at, balık bilmezse Halik bilir", aciklama: "Karşılık beklemeden yapılan olumlu davranış, başkaları fark etmese de değerlidir." },
+        { atasozu: "Kalp kalbe karşıdır", aciklama: "İki kişi arasındaki duygusal yakınlık çoğu zaman tek taraflı kalmaz." },
+        { atasozu: "Kara haber tez duyulur", aciklama: "Olumsuz gelişmelere ilişkin bilgiler toplum içinde hızla yayılabilir." },
+        { atasozu: "Karga kekliği taklit edeyim derken kendi yürüyüşünü şaşırmış", aciklama: "Sürekli başkalarına benzemeye çalışan kişi kendine özgü yönlerini kaybedebilir." },
+        { atasozu: "Kaz gelen yerden tavuk esirgenmez", aciklama: "Büyük bir getiri beklenen yerde küçük bir masraftan kaçınmak mantıklı değildir." },
+        { atasozu: "Keçi can derdinde, kasap yağ derdinde", aciklama: "Aynı durumdaki kişiler bile önceliklerini yalnızca kendi çıkarlarına göre belirleyebilir." },
+        { atasozu: "Kedinin boynuna ciğer asılmaz", aciklama: "Güvenilir olmayan kişiye değerli bir sorumluluk verilmemelidir." },
+        { atasozu: "Kelin ilacı olsa başına sürer", aciklama: "Kendi sorununu çözemeyen birinden aynı konuda başkasına çözüm üretmesi beklenmez." },
+        { atasozu: "Kendi düşen ağlamaz", aciklama: "Kendi tercihi nedeniyle olumsuzluk yaşayan kişi sonucu kabullenmek zorundadır." },
+        { atasozu: "Kısmetinde ne varsa kaşığında o çıkar", aciklama: "İnsanın karşısına çıkacak imkânların bir bölümü kendi kontrolü dışında gelişebilir." },
+        { atasozu: "Kızım sana söylüyorum, gelinim sen anla", aciklama: "Bir kişiye yöneltilmiş gibi görünen ifade, aslında başka birine mesaj vermek amacı taşıyabilir." },
+        { atasozu: "Komşuda pişer, bize de düşer", aciklama: "Yakın çevrede oluşan imkânlardan başkaları da dolaylı biçimde yararlanabilir." },
+        { atasozu: "Kurunun yanında yaş da yanar", aciklama: "Bir gruba yönelik yaptırım, suçu olmayan kişileri de etkileyebilir." },
+        { atasozu: "Kurt kocayınca köpeğin maskarası olur", aciklama: "Gücünü kaybeden kişi, eskiden önemsemediği kimseler karşısında zor durumda kalabilir." },
+        { atasozu: "Laf torbaya girmez", aciklama: "Ağızdan çıkan ifadelerin yayılmasını sonradan denetlemek güçtür." },
+        { atasozu: "Mal canın yongasıdır", aciklama: "İnsan sahip olduğu varlıkların kaybından duygusal olarak etkilenir." },
+        { atasozu: "Misafir kısmeti ile gelir", aciklama: "Paylaşma niyeti olduğunda mevcut imkânların yeterli olacağı düşünülür." },
+        { atasozu: "Nerede birlik, orada dirlik", aciklama: "Uyum içinde hareket eden topluluklarda huzur ve düzen daha kolay sağlanır." },
+        { atasozu: "Ne doğrarsan aşına, o çıkar kaşığına", aciklama: "Kişinin yaptığı tercihler, daha sonra karşısına çıkacak sonuçları belirler." },
+        { atasozu: "Ne verirsen elinle, o gider seninle", aciklama: "İnsanın kalıcı değeri, yaşamı boyunca yaptığı olumlu katkılarla ölçülür." },
+        { atasozu: "Otu çek köküne bak", aciklama: "Bir kişiyi değerlendirirken yetiştiği çevre ve aile koşulları da dikkate alınmalıdır." },
+        { atasozu: "Para parayı çeker", aciklama: "Başlangıçta güçlü kaynaklara sahip olmak, ekonomik büyümeyi kolaylaştırabilir." },
+        { atasozu: "Pilavdan dönenin kaşığı kırılsın", aciklama: "Bir sorumluluğu üstlenen kişi, ilk güçlükte geri çekilmemelidir." },
+        { atasozu: "Rüzgâra tüküren kendi yüzüne tükürür", aciklama: "Başkalarına zarar vermeye yönelik davranış, dönüp sahibini olumsuz etkileyebilir." },
+        { atasozu: "Sabrın sonu selamettir", aciklama: "Kararlılığını korumak, beklenen olumlu gelişmenin gerçekleşme ihtimalini artırır." },
+        { atasozu: "Sakınılan göze çöp batar", aciklama: "Aşırı korumacı davranmak, istenmeyen durumların gerçekleşmesini her zaman önleyemez." },
+        { atasozu: "Sana taşla vurana sen aşla vur", aciklama: "Kötü davranışa aynı biçimde karşılık vermek yerine erdemli tutum sergilemek daha değerlidir." },
+        { atasozu: "Sayılı gün tez geçer", aciklama: "Bitiş tarihi belirli bir süreç, insana düşündüğünden daha kısa gelebilir." },
+        { atasozu: "Sel gider kum kalır", aciklama: "Geçici unsurlar zamanla yok olur; esas değer taşıyanlar varlığını sürdürür." },
+        { atasozu: "Sinek küçüktür ama mide bulandırır", aciklama: "Önemsiz görünen bir problem bile ciddi huzursuzluk yaratabilir." },
+        { atasozu: "Yuvayı dişi kuş yapar", aciklama: "Aile yaşamının düzenlenmesinde kadının emeğine geleneksel olarak önemli rol atfedilir." },
+        { atasozu: "Son gülen iyi güler", aciklama: "Bir yarışın gerçek kazananı, süreç tamamlandığında değerlendirilir." }
+    ];
+
+    // ─── OYUN DURUMU ──────────────────────────────────────────────────
+    let setSoru = [];
+    let indeks = 0;
+    let puan = 0;
+    let cevapVerildi = false;
+    let zamanlayici = null;
+    const SET_ADET = 10;
+
+    let alkisCtx = null;
+    function alkisCal() {
+        try {
+            alkisCtx = alkisCtx || new (window.AudioContext || window.webkitAudioContext)();
+            const ctx = alkisCtx;
+            if (ctx.state === 'suspended') ctx.resume();
+            const dur = 1.1;
+            const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+            const data = buf.getChannelData(0);
+            for (let i = 0; i < data.length; i++) {
+                const t = i / data.length;
+                const env = Math.sin(Math.PI * t) * (1 - t * 0.3);
+                const clap = (Math.random() * 2 - 1) * (Math.random() < 0.06 ? 1 : 0.25);
+                data[i] = clap * env * 0.5;
+            }
+            const src = ctx.createBufferSource();
+            src.buffer = buf;
+            const filt = ctx.createBiquadFilter();
+            filt.type = 'bandpass'; filt.frequency.value = 1800; filt.Q.value = 0.7;
+            const gain = ctx.createGain(); gain.gain.value = 0.9;
+            src.connect(filt); filt.connect(gain); gain.connect(ctx.destination);
+            src.start();
+        } catch (e) { /* sessiz */ }
+    }
+
+    function konfetiFirlat() {
+        const renkler = ['#4fa0e8', '#15457a', '#ffd36b', '#5ec87a', '#e8709b', '#ffffff'];
+        const N = 80;
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;';
+        document.body.appendChild(wrap);
+        for (let i = 0; i < N; i++) {
+            const p = document.createElement('div');
+            const sz = 6 + Math.random() * 8;
+            const left = Math.random() * 100;
+            const dur = 1.6 + Math.random() * 1.4;
+            const delay = Math.random() * 0.25;
+            const rot = Math.random() * 360;
+            const drift = (Math.random() * 2 - 1) * 120;
+            p.style.cssText = `position:absolute;top:-20px;left:${left}%;width:${sz}px;height:${sz * 0.5}px;`
+                + `background:${renkler[i % renkler.length]};opacity:0;`
+                + `border-radius:${Math.random() < 0.5 ? '50%' : '2px'};`
+                + `transform:rotate(${rot}deg);`
+                + `animation:confFall ${dur}s ${delay}s ease-in forwards;`
+                + `--drift:${drift}px;`;
+            wrap.appendChild(p);
+        }
+        setTimeout(() => wrap.remove(), 3600);
+    }
+
+    function kutla() {
+        alkisCal();
+        konfetiFirlat();
+    }
+
+    function karistir(dizi) {
+        const k = [...dizi];
+        for (let i = k.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [k[i], k[j]] = [k[j], k[i]];
+        }
+        return k;
+    }
+
+    function setOlustur() {
+        const hepsi = [...ATASOZLERI];
+        const secilen = karistir(hepsi).slice(0, SET_ADET);
+        return secilen.map(s => {
+            const digerAtasozleri = ATASOZLERI.filter(d => d.atasozu !== s.atasozu).map(d => d.atasozu);
+            const yanlis = karistir(digerAtasozleri).slice(0, 2);
+            const secenekler = karistir([s.atasozu, ...yanlis]);
+            return {
+                atasozu: s.atasozu,
+                aciklama: s.aciklama,
+                secenekler: secenekler
+            };
+        });
+    }
+
+    function render() {
+        clearTimeout(zamanlayici);
+        if (indeks >= setSoru.length) {
+            document.getElementById('geriBildirim').textContent = '🎉 Set tamamlandı! Yeni Set ile devam edin.';
+            document.getElementById('sonrakiBtn').disabled = true;
+            document.getElementById('sesBtn').disabled = true;
+            return;
+        }
+
+        const soru = setSoru[indeks];
+        document.getElementById('soruNo').textContent = indeks + 1;
+        document.getElementById('toplamSoru').textContent = SET_ADET;
+        document.getElementById('anlamMetin').textContent = soru.aciklama;
+
+        const kutu = document.getElementById('secenekKutu');
+        kutu.innerHTML = '';
+        soru.secenekler.forEach(sec => {
+            const btn = document.createElement('button');
+            btn.className = 'sec-btn';
+            btn.textContent = sec;
+            btn.addEventListener('click', () => cevapKontrol(sec));
+            kutu.appendChild(btn);
+        });
+
+        document.getElementById('geriBildirim').textContent = '💡 Bir seçenek seçin';
+        cevapVerildi = false;
+        document.getElementById('sonrakiBtn').disabled = false;
+        document.getElementById('sesBtn').disabled = false;
+    }
+
+    function cevapKontrol(secim) {
+        if (cevapVerildi) return;
+        cevapVerildi = true;
+        const soru = setSoru[indeks];
+        const dogru = secim === soru.atasozu;
+
+        if (dogru) {
+            puan++;
+            document.getElementById('puan').textContent = puan;
+            document.getElementById('geriBildirim').textContent = '✅ Doğru! +1 puan';
+            kutla();
+        } else {
+            document.getElementById('geriBildirim').textContent = '❌ Yanlış! Doğru: ' + soru.atasozu;
+        }
+
+        const butonlar = document.querySelectorAll('.sec-btn');
+        butonlar.forEach(b => {
+            b.disabled = true;
+            if (b.textContent === soru.atasozu) b.classList.add('dogru');
+            else if (b.textContent === secim && !dogru) b.classList.add('yanlis');
+        });
+
+        zamanlayici = setTimeout(ileri, 1500);
+    }
+
+    function ileri() {
+        if (!cevapVerildi) {
+            document.getElementById('geriBildirim').textContent = '️ Önce cevap seçin!';
+            return;
+        }
+        indeks++;
+        render();
+    }
+
+    let ses = null;
+    function sesOku(aciklama) {
+        if (!window.speechSynthesis) return;
+        const metin = `Açıklama: ${aciklama}`;
+        if (ses) {
+            speechSynthesis.cancel();
+        }
+        const u = new SpeechSynthesisUtterance(metin);
+        u.lang = 'tr-TR';
+        u.rate = 0.8;
+        u.pitch = 1;
+        speechSynthesis.speak(u);
+    }
+
+    function sifirla() {
+        clearTimeout(zamanlayici);
+        speechSynthesis.cancel();
+        setSoru = setOlustur();
+        indeks = 0;
+        puan = 0;
+        cevapVerildi = false;
+        document.getElementById('puan').textContent = '0';
+        render();
+    }
+
+    document.getElementById('sonrakiBtn').addEventListener('click', ileri);
+    document.getElementById('sifirlaBtn').addEventListener('click', sifirla);
+    document.getElementById('sesBtn').addEventListener('click', () => {
+        if (indeks < setSoru.length) {
+            const s = setSoru[indeks];
+            sesOku(s.aciklama);
+        }
+    });
+
+    setSoru = setOlustur();
+    render();
+</script>
+
+</body>
+</html>
